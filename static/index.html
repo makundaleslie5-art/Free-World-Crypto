@@ -2,233 +2,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FREE WORLD CRYPTO</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0b1020;
-            color: #f5f7ff;
-        }
-
-        header {
-            padding: 22px 7%;
-            background: #121a30;
-            border-bottom: 1px solid #263452;
-        }
-
-        header h1 {
-            margin: 0;
-            color: #35e0a1;
-            letter-spacing: 2px;
-        }
-
-        header p {
-            color: #aab6d3;
-            margin-bottom: 0;
-        }
-
-        main {
-            max-width: 1100px;
-            margin: auto;
-            padding: 30px 20px;
-        }
-
-        .welcome {
-            margin-bottom: 25px;
-        }
-
-        .welcome h2 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .welcome p {
-            color: #aab6d3;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 20px;
-            background: #183b35;
-            color: #6cf0bd;
-            font-size: 13px;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 18px;
-            margin-top: 25px;
-        }
-
-        .card {
-            background: #121a30;
-            border: 1px solid #263452;
-            border-radius: 14px;
-            padding: 22px;
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: #aab6d3;
-            font-size: 15px;
-        }
-
-        .price {
-            font-size: 25px;
-            font-weight: bold;
-            margin: 15px 0 5px;
-        }
-
-        .symbol {
-            color: #35e0a1;
-            font-size: 13px;
-        }
-
-        .section {
-            margin-top: 30px;
-            background: #121a30;
-            border: 1px solid #263452;
-            border-radius: 14px;
-            padding: 22px;
-        }
-
-        button {
-            background: #35e0a1;
-            color: #08131a;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #70f5c3;
-        }
-
-        #message {
-            color: #aab6d3;
-            margin-top: 15px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 25px;
-            color: #8794b3;
-            font-size: 13px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FREE WORLD CRYPTO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#f5f7ff}
+header{padding:22px 6%;background:#121a30;border-bottom:1px solid #263452}
+header h1{margin:0;color:#35e0a1;letter-spacing:2px}
+header p,.muted{color:#aab6d3}
+main{max-width:1150px;margin:auto;padding:28px 20px}
+.status{display:inline-block;padding:8px 12px;border-radius:20px;background:#183b35;color:#6cf0bd;font-size:12px}
+h2{margin-top:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.card,.panel{background:#121a30;border:1px solid #263452;border-radius:14px;padding:20px}
+.card h3{margin-top:0;color:#aab6d3;font-size:14px}
+.big{font-size:26px;font-weight:bold;margin:12px 0}
+.green{color:#35e0a1}
+label{display:block;margin:14px 0 6px;color:#aab6d3}
+input,select{width:100%;padding:12px;background:#0b1020;color:#fff;border:1px solid #354463;border-radius:8px}
+button{background:#35e0a1;color:#08131a;border:0;border-radius:8px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-top:14px}
+button:hover{background:#70f5c3}
+.secondary{background:#263452;color:#fff}
+.forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #263452;overflow-wrap:anywhere}
+th{color:#aab6d3;font-size:13px}
+.notice{color:#aab6d3;font-size:13px}
+#message{margin-top:14px;overflow-wrap:anywhere}
+footer{text-align:center;padding:25px;color:#8794b3;font-size:13px}
+@media(max-width:500px){main{padding:20px 12px}.big{font-size:22px}.panel{padding:15px}}
+</style>
 </head>
 <body>
-    <header>
-        <h1>FREE WORLD CRYPTO</h1>
-        <p>Your crypto trading platform — built step by step.</p>
-    </header>
+<header>
+<h1>FREE WORLD CRYPTO</h1>
+<p>Your crypto journey starts here.</p>
+<span class="status">● SIMULATION MODE</span>
+</header>
 
-    <main>
-        <section class="welcome">
-            <span class="status">● SIMULATION MODE</span>
-            <h2>Welcome to your dashboard</h2>
-            <p>Explore cryptocurrency prices and prepare for simulated trading.</p>
-        </section>
+<main>
+<h2>Overview</h2>
+<p class="muted">Welcome to your demo trading dashboard.</p>
 
-        <h2>Market Overview</h2>
+<section class="grid">
+<div class="card">
+<h3>AVAILABLE BALANCE</h3>
+<div class="big green" id="balance">$—</div>
+<div class="notice">Demo USD funds</div>
+</div>
+<div class="card">
+<h3>CRYPTO ASSETS</h3>
+<div class="big" id="assetCount">—</div>
+<div class="notice">Currencies held</div>
+</div>
+<div class="card">
+<h3>TRANSACTIONS</h3>
+<div class="big" id="txCount">—</div>
+<div class="notice">Recorded demo trades</div>
+</div>
+</section>
 
-        <section class="cards" id="market">
-            <article class="card">
-                <h3>Bitcoin</h3>
-                <div class="price">Loading...</div>
-                <div class="symbol">BTC</div>
-            </article>
+<h2>Market Overview</h2>
+<section class="grid" id="market">
+<div class="card">Loading market prices...</div>
+</section>
 
-            <article class="card">
-                <h3>Ethereum</h3>
-                <div class="price">Loading...</div>
-                <div class="symbol">ETH</div>
-            </article>
+<h2>Demo Trading</h2>
+<section class="forms">
+<div class="panel">
+<h3>Buy Cryptocurrency</h3>
+<form id="buyForm">
+<label for="buySymbol">Cryptocurrency</label>
+<select id="buySymbol">
+<option value="BTC">Bitcoin (BTC)</option>
+<option value="ETH" selected>Ethereum (ETH)</option>
+<option value="SOL">Solana (SOL)</option>
+<option value="FREE">Free World (FREE)</option>
+</select>
+<label for="buyQuantity">Quantity to buy</label>
+<input id="buyQuantity" type="number" min="0.00000001" step="any" value="0.01" required>
+<button type="submit">Buy with Demo Funds</button>
+</form>
+</div>
 
-            <article class="card">
-                <h3>Solana</h3>
-                <div class="price">Loading...</div>
-                <div class="symbol">SOL</div>
-            </article>
-        </section>
+<div class="panel">
+<h3>Sell Cryptocurrency</h3>
+<form id="sellForm">
+<label for="sellSymbol">Cryptocurrency</label>
+<select id="sellSymbol">
+<option value="BTC">Bitcoin (BTC)</option>
+<option value="ETH" selected>Ethereum (ETH)</option>
+<option value="SOL">Solana (SOL)</option>
+<option value="FREE">Free World (FREE)</option>
+</select>
+<label for="sellQuantity">Quantity to sell</label>
+<input id="sellQuantity" type="number" min="0.00000001" step="any" value="0.005" required>
+<button type="submit">Sell Demo Holdings</button>
+</form>
+</div>
+</section>
 
-        <section class="section">
-            <h2>Trading Practice</h2>
-            <p>Real money is not used in this development version.</p>
-            <button id="demoButton">Check API Connection</button>
-            <p id="message">The dashboard is ready to test.</p>
-        </section>
-    </main>
+<div class="panel">
+<button class="secondary" id="refresh">Refresh Wallet and Prices</button>
+<p id="message" role="status">Connecting to your API...</p>
+<p class="notice">Demo trading only. Prices are sample values and may not reflect real markets.</p>
+</div>
 
-    <footer>
-        FREE WORLD CRYPTO · Development Version · Simulation Only
-    </footer>
+<h2>Your Holdings</h2>
+<div class="panel">
+<table>
+<thead><tr><th>Asset</th><th>Quantity</th></tr></thead>
+<tbody id="holdings"><tr><td colspan="2">Loading...</td></tr></tbody>
+</table>
+</div>
 
-    <script>
-        async function loadMarketPrices() {
-            const market = document.getElementById("market");
+<h2>Transaction History</h2>
+<div class="panel">
+<table>
+<thead><tr><th>Type</th><th>Asset</th><th>Quantity</th><th>Total USD</th></tr></thead>
+<tbody id="transactions"><tr><td colspan="4">Loading...</td></tr></tbody>
+</table>
+</div>
+</main>
 
-            try {
-                const response = await fetch("/market/prices");
+<footer>FREE WORLD CRYPTO · Development Version · Simulation Only</footer>
 
-                if (!response.ok) {
-                    throw new Error("Market API request failed");
-                }
+<script>
+const names = {
+ BTC: "Bitcoin",
+ ETH: "Ethereum",
+ SOL: "Solana",
+ FREE: "Free World"
+};
 
-                const data = await response.json();
+const money = value => "$" + Number(value).toLocaleString("en-US", {
+ minimumFractionDigits: 2,
+ maximumFractionDigits: 2
+});
 
-                market.innerHTML = data.prices.map(coin => `
-                    <article class="card">
-                        <h3>${coin.name}</h3>
-                        <div class="price">
-                            $${Number(coin.price_usd).toLocaleString(
-                                "en-US",
-                                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                            )}
-                        </div>
-                        <div class="symbol">${coin.symbol}</div>
-                    </article>
-                `).join("");
-            } catch (error) {
-                market.innerHTML =
-                    "<p>Could not load prices. Check the API server.</p>";
-            }
-        }
+async function api(path, options = {}) {
+ const response = await fetch(path, options);
+ const data = await response.json();
+ if (!response.ok) {
+  throw new Error(data.detail || "The request failed.");
+ }
+ return data;
+}
 
-        document.getElementById("demoButton").addEventListener("click", async () => {
-            const message = document.getElementById("message");
-            message.textContent = "Checking connection...";
+async function loadMarket() {
+ const market = document.getElementById("market");
+ try {
+  const data = await api("/market/prices");
+  market.innerHTML = data.prices.map(coin => `
+   <article class="card">
+    <h3>${names[coin.symbol] || coin.symbol}</h3>
+    <div class="big">${money(coin.price)}</div>
+    <div class="green">${coin.symbol}</div>
+   </article>
+  `).join("");
+ } catch (error) {
+  market.innerHTML = "<div class='card'>Could not load market prices.</div>";
+ }
+}
 
-            try {
-                const response = await fetch("/health");
+async function loadWallet() {
+ const wallet = await api("/wallet");
+ document.getElementById("balance").textContent =
+  money(wallet.available_balance);
+ const holdings = Object.entries(wallet.holdings || {});
+ document.getElementById("assetCount").textContent = holdings.length;
+ document.getElementById("txCount").textContent =
+  (wallet.transactions || []).length;
 
-                if (!response.ok) {
-                    throw new Error("Health check failed");
-                }
+ document.getElementById("holdings").innerHTML = holdings.length
+  ? holdings.map(([symbol, quantity]) => `
+    <tr><td>${names[symbol] || symbol} (${symbol})</td>
+    <td>${Number(quantity).toLocaleString("en-US",{maximumFractionDigits:8})}</td></tr>
+   `).join("")
+  : "<tr><td colspan='2'>No crypto holdings yet.</td></tr>";
 
-                const data = await response.json();
-                message.textContent =
-                    "API connected! Status: " + data.status +
-                    ". Trading mode: " + data.trading_mode + ".";
-            } catch (error) {
-                message.textContent =
-                    "Could not connect. Please check the server.";
-            }
-        });
+ const transactions = wallet.transactions || [];
+ document.getElementById("transactions").innerHTML = transactions.length
+  ? [...transactions].reverse().map(tx => `
+    <tr><td>${tx.side}</td><td>${tx.symbol}</td>
+    <td>${Number(tx.quantity).toLocaleString("en-US",{maximumFractionDigits:8})}</td>
+    <td>${money(tx.total)}</td></tr>
+   `).join("")
+  : "<tr><td colspan='4'>No transactions yet.</td></tr>";
+}
 
-        loadMarketPrices();
-    </script>
+async function refreshDashboard() {
+ const message = document.getElementById("message");
+ message.textContent = "Refreshing dashboard...";
+ try {
+  await Promise.all([loadMarket(), loadWallet()]);
+  message.textContent = "Dashboard updated successfully.";
+ } catch (error) {
+  message.textContent = "Could not load wallet: " + error.message;
+ }
+}
+
+async function trade(side, symbol, quantity) {
+ const message = document.getElementById("message");
+ message.textContent = "Processing simulated trade...";
+ try {
+  const result = await api("/trade/" + side, {
+   method: "POST",
+   headers: {"Content-Type": "application/json"},
+   body: JSON.stringify({symbol, quantity})
+  });
+  message.textContent = result.message;
+  await refreshDashboard();
+ } catch (error) {
+  message.textContent = "Trade failed: " + error.message;
+ }
+}
+
+document.getElementById("buyForm").addEventListener("submit", event => {
+ event.preventDefault();
+ const symbol = document.getElementById("buySymbol").value;
+ const quantity = Number(document.getElementById("buyQuantity").value);
+ if (Number.isFinite(quantity) && quantity > 0) trade("buy", symbol, quantity);
+});
+
+document.getElementById("sellForm").addEventListener("submit", event => {
+ event.preventDefault();
+ const symbol = document.getElementById("sellSymbol").value;
+ const quantity = Number(document.getElementById("sellQuantity").value);
+ if (Number.isFinite(quantity) && quantity > 0) trade("sell", symbol, quantity);
+});
+
+document.getElementById("refresh").addEventListener("click", refreshDashboard);
+refreshDashboard();
+</script>
 </body>
 </html>
 

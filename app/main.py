@@ -1,11 +1,19 @@
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+from app.services.trading import PRICES, buy, sell, get_wallet
 
 app = FastAPI(
     title="Free World Crypto",
     description="Our crypto trading platform API",
-    version="0.1.0",
+    version="0.2.0",
 )
+
+
+class TradeRequest(BaseModel):
+    symbol: str = Field(min_length=1, max_length=10)
+    quantity: float = Field(gt=0, le=1_000_000)
 
 
 @app.get("/")
@@ -13,6 +21,7 @@ def home():
     return {
         "message": "Welcome to Free World Crypto!",
         "status": "under development",
+        "mode": "simulation only",
     }
 
 
@@ -23,19 +32,20 @@ def health_check():
         "trading_mode": "simulation_only",
     }
 
+
 @app.get("/market/prices")
 def market_prices():
     return {
         "market": "Free World Crypto",
         "mode": "simulation",
         "prices": [
-            {"symbol": "BTC", "name": "Bitcoin", "price": 65000.00},
-            {"symbol": "ETH", "name": "Ethereum", "price": 3200.00},
-            {"symbol": "SOL", "name": "Solana", "price": 150.00},
-            {"symbol": "FREE", "name": "Free World", "price": 0.01}
+            {"symbol": symbol, "price": price}
+            for symbol, price in PRICES.items()
         ],
-        "notice": "Sample prices for practice only."
+        "notice": "Sample prices for practice only.",
     }
+
+
 @app.get("/dashboard")
 def dashboard():
     return FileResponse("static/index.html")
@@ -43,13 +53,28 @@ def dashboard():
 
 @app.get("/wallet")
 def demo_wallet():
-    return {
-        "wallet_name": "Ghost Demo Wallet",
-        "currency": "USD",
-        "starting_balance": 10000.00,
-        "available_balance": 10000.00,
-        "holdings": [],
-        "mode": "simulation",
-        "notice": "Demo funds only. No real money is held."
-    }
+    return get_wallet()
 
+
+@app.post("/trade/buy")
+def buy_crypto(request: TradeRequest):
+    try:
+        return {
+            "message": "Demo purchase successful",
+            "transaction": buy(request.symbol, request.quantity),
+            "wallet": get_wallet(),
+        }
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+
+
+@app.post("/trade/sell")
+def sell_crypto(request: TradeRequest):
+    try:
+        return {
+            "message": "Demo sale successful",
+            "transaction": sell(request.symbol, request.quantity),
+            "wallet": get_wallet(),
+        }
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
