@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREE WORLD CRYPTO</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: #f5f7ff;
+        }
+
+        header {
+            padding: 22px 7%;
+            background: #121a30;
+            border-bottom: 1px solid #263452;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #35e0a1;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: #aab6d3;
+            margin-bottom: 0;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #aab6d3;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: #183b35;
+            color: #6cf0bd;
+            font-size: 13px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .card {
+            background: #121a30;
+            border: 1px solid #263452;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #aab6d3;
+            font-size: 15px;
+        }
+
+        .price {
+            font-size: 25px;
+            font-weight: bold;
+            margin: 15px 0 5px;
+        }
+
+        .symbol {
+            color: #35e0a1;
+            font-size: 13px;
+        }
+
+        .section {
+            margin-top: 30px;
+            background: #121a30;
+            border: 1px solid #263452;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        button {
+            background: #35e0a1;
+            color: #08131a;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #70f5c3;
+        }
+
+        #message {
+            color: #aab6d3;
+            margin-top: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #8794b3;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>FREE WORLD CRYPTO</h1>
+        <p>Your crypto trading platform — built step by step.</p>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <span class="status">● SIMULATION MODE</span>
+            <h2>Welcome to your dashboard</h2>
+            <p>Explore cryptocurrency prices and prepare for simulated trading.</p>
+        </section>
+
+        <h2>Market Overview</h2>
+
+        <section class="cards" id="market">
+            <article class="card">
+                <h3>Bitcoin</h3>
+                <div class="price">Loading...</div>
+                <div class="symbol">BTC</div>
+            </article>
+
+            <article class="card">
+                <h3>Ethereum</h3>
+                <div class="price">Loading...</div>
+                <div class="symbol">ETH</div>
+            </article>
+
+            <article class="card">
+                <h3>Solana</h3>
+                <div class="price">Loading...</div>
+                <div class="symbol">SOL</div>
+            </article>
+        </section>
+
+        <section class="section">
+            <h2>Trading Practice</h2>
+            <p>Real money is not used in this development version.</p>
+            <button id="demoButton">Check API Connection</button>
+            <p id="message">The dashboard is ready to test.</p>
+        </section>
+    </main>
+
+    <footer>
+        FREE WORLD CRYPTO · Development Version · Simulation Only
+    </footer>
+
+    <script>
+        async function loadMarketPrices() {
+            const market = document.getElementById("market");
+
+            try {
+                const response = await fetch("/market/prices");
+
+                if (!response.ok) {
+                    throw new Error("Market API request failed");
+                }
+
+                const data = await response.json();
+
+                market.innerHTML = data.prices.map(coin => `
+                    <article class="card">
+                        <h3>${coin.name}</h3>
+                        <div class="price">
+                            $${Number(coin.price_usd).toLocaleString(
+                                "en-US",
+                                { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                            )}
+                        </div>
+                        <div class="symbol">${coin.symbol}</div>
+                    </article>
+                `).join("");
+            } catch (error) {
+                market.innerHTML =
+                    "<p>Could not load prices. Check the API server.</p>";
+            }
+        }
+
+        document.getElementById("demoButton").addEventListener("click", async () => {
+            const message = document.getElementById("message");
+            message.textContent = "Checking connection...";
+
+            try {
+                const response = await fetch("/health");
+
+                if (!response.ok) {
+                    throw new Error("Health check failed");
+                }
+
+                const data = await response.json();
+                message.textContent =
+                    "API connected! Status: " + data.status +
+                    ". Trading mode: " + data.trading_mode + ".";
+            } catch (error) {
+                message.textContent =
+                    "Could not connect. Please check the server.";
+            }
+        });
+
+        loadMarketPrices();
+    </script>
+</body>
+</html>
+
