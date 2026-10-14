@@ -1,6 +1,8 @@
 
 from threading import Lock
 
+from app.core.database import get_connection
+
 STARTING_BALANCE = 10_000.00
 
 wallet = {
@@ -21,6 +23,37 @@ PRICES = {
 }
 
 
+def load_wallet():
+    """Load the saved wallet and transaction history from SQLite."""
+    with get_connection() as connection:
+        balance_row = connection.execute(
+            "SELECT available_balance FROM wallet WHERE id = 1"
+        ).fetchone()
+
+        holdings_rows = connection.execute(
+            "SELECT symbol, quantity FROM holdings"
+        ).fetchall()
+
+        transaction_rows = connection.execute("""
+            SELECT side, symbol, quantity, price, total
+            FROM transactions
+            ORDER BY id
+        """).fetchall()
+
+    if balance_row is None:
+        raise RuntimeError(
+            "Wallet not initialized. Initialize the database first."
+        )
+
+    wallet["available_balance"] = balance_row["available_balance"]
+    wallet["holdings"] = {
+        row["symbol"]: row["quantity"] for row in holdings_rows
+    }
+    wallet["transactions"] = [
+        dict(row) for row in transaction_rows
+    ]
+
+
 def buy(symbol: str, quantity: float):
     symbol = symbol.upper()
 
@@ -32,26 +65,41 @@ def buy(symbol: str, quantity: float):
 
     with wallet_lock:
         cost = PRICES[symbol] * quantity
+        cost = round(cost, 2)
 
         if cost > wallet["available_balance"]:
             raise ValueError("Insufficient demo USD balance.")
 
-        wallet["available_balance"] = round(
-            wallet["available_balance"] - cost, 2
-        )
+        with get_connection() as connection:
+            connection.execute(
+                "UPDATE wallet SET available_balance = "
+                "ROUND(available_balance - ?, 2) WHERE id = 1",
+                (cost,),
+            )
 
-        holdings = wallet["holdings"]
-        holdings[symbol] = holdings.get(symbol, 0.0) + quantity
+            connection.execute("""
+                INSERT INTO holdings (symbol, quantity)
+                VALUES (?, ?)
+                ON CONFLICT(symbol) DO UPDATE SET
+                    quantity = quantity + excluded.quantity
+            """, (symbol, quantity))
 
-        transaction = {
-            "side": "BUY",
-            "symbol": symbol,
-            "quantity": quantity,
-            "price": PRICES[symbol],
-            "total": round(cost, 2),
-        }
+            cursor = connection.execute("""
+                INSERT INTO transactions
+                    (side, symbol, quantity, price, total)
+                VALUES ('BUY', ?, ?, ?, ?)
+            """, (symbol, quantity, PRICES[symbol], cost))
 
-        wallet["transactions"].append(transaction)
+            transaction = {
+                "id": cursor.lastrowid,
+                "side": "BUY",
+                "symbol": symbol,
+                "quantity": quantity,
+                "price": PRICES[symbol],
+                "total": cost,
+            }
+
+        load_wallet()
         return transaction.copy()
 
 
@@ -65,38 +113,55 @@ def sell(symbol: str, quantity: float):
         raise ValueError("Quantity must be greater than zero.")
 
     with wallet_lock:
-        holdings = wallet["holdings"]
-        owned = holdings.get(symbol, 0.0)
+        owned = wallet["holdings"].get(symbol, 0.0)
 
         if quantity > owned:
             raise ValueError("Insufficient crypto holdings.")
 
-        proceeds = PRICES[symbol] * quantity
+        proceeds = round(PRICES[symbol] * quantity, 2)
         remaining = owned - quantity
 
-        if remaining < 1e-12:
-            holdings.pop(symbol, None)
-        else:
-            holdings[symbol] = remaining
+        with get_connection() as connection:
+            connection.execute(
+                "UPDATE wallet SET available_balance = "
+                "ROUND(available_balance + ?, 2) WHERE id = 1",
+                (proceeds,),
+            )
 
-        wallet["available_balance"] = round(
-            wallet["available_balance"] + proceeds, 2
-        )
+            if remaining < 1e-12:
+                connection.execute(
+                    "DELETE FROM holdings WHERE symbol = ?", (symbol,)
+                )
+            else:
+                connection.execute(
+                    "UPDATE holdings SET quantity = ? WHERE symbol = ?",
+                    (remaining, symbol),
+                )
 
-        transaction = {
-            "side": "SELL",
-            "symbol": symbol,
-            "quantity": quantity,
-            "price": PRICES[symbol],
-            "total": round(proceeds, 2),
-        }
+            cursor = connection.execute("""
+                INSERT INTO transactions
+                    (side, symbol, quantity, price, total)
+                VALUES ('SELL', ?, ?, ?, ?)
+            """, (symbol, quantity, PRICES[symbol], proceeds))
 
-        wallet["transactions"].append(transaction)
+            transaction = {
+                "id": cursor.lastrowid,
+                "side": "SELL",
+                "symbol": symbol,
+                "quantity": quantity,
+                "price": PRICES[symbol],
+                "total": proceeds,
+            }
+
+        load_wallet()
         return transaction.copy()
 
 
 def get_wallet():
     with wallet_lock:
+        # Read the latest persisted state so the API reflects SQLite.
+        load_wallet()
+
         return {
             **wallet,
             "holdings": wallet["holdings"].copy(),

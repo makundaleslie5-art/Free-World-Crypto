@@ -84,8 +84,31 @@ footer{text-align:center;padding:25px;color:#8794b3;font-size:13px}
 <input id="buyQuantity" type="number" min="0.00000001" step="any" value="0.01" required>
 <button type="submit">Buy with Demo Funds</button>
 </form>
+<div class="card">
+<h3>TRANSACTIONS</h3>
+<div class="big" id="txCount">—</div>
+<div class="notice">Recorded demo trades</div>
 </div>
 
+<div class="card">
+<h3>CRYPTO HOLDINGS VALUE</h3>
+<div class="big" id="holdingsValue">$0.00</div>
+<div class="notice">Simulated coin value</div>
+</div>
+
+<div class="card">
+<h3>TOTAL PORTFOLIO VALUE</h3>
+<div class="big green" id="portfolioValue">$10,000.00</div>
+<div class="notice">Balance + crypto value</div>
+</div>
+
+<div class="card">
+<h3>SIMULATED PROFIT / LOSS</h3>
+<div class="big" id="profitLoss">$0.00</div>
+<div class="notice">Compared with $10,000 starting funds</div>
+</div>
+</section>
+</div>
 <div class="panel">
 <h3>Sell Cryptocurrency</h3>
 <form id="sellForm">
@@ -170,7 +193,33 @@ async function loadWallet() {
  const wallet = await api("/wallet");
  document.getElementById("balance").textContent =
   money(wallet.available_balance);
+ const marketData = await api("/market/prices");
+
+ const prices = {};
+ marketData.prices.forEach(coin => {
+  prices[coin.symbol] = coin.price;
+ });
+
  const holdings = Object.entries(wallet.holdings || {});
+
+ const cryptoValue = holdings.reduce((total, [symbol, quantity]) => {
+  return total + quantity * (prices[symbol] || 0);
+ }, 0);
+
+ const portfolioValue = wallet.available_balance + cryptoValue;
+ const profitLoss = portfolioValue - 10000;
+
+ document.getElementById("holdingsValue").textContent =
+  money(cryptoValue);
+
+ document.getElementById("portfolioValue").textContent =
+  money(portfolioValue);
+
+ const profitElement = document.getElementById("profitLoss");
+ profitElement.textContent =
+  (profitLoss >= 0 ? "+" : "-") + money(Math.abs(profitLoss));
+ profitElement.className =
+  "big " + (profitLoss >= 0 ? "green" : "");
  document.getElementById("assetCount").textContent = holdings.length;
  document.getElementById("txCount").textContent =
   (wallet.transactions || []).length;

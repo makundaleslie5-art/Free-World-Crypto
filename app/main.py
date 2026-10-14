@@ -2,13 +2,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from app.services.trading import PRICES, buy, sell, get_wallet
+from app.core.database import initialize_database
+from app.services.trading import PRICES, buy, sell, get_wallet, load_wallet
 
 app = FastAPI(
     title="Free World Crypto",
     description="Our crypto trading platform API",
     version="0.2.0",
 )
+
+
+@app.on_event("startup")
+def startup():
+    initialize_database()
+    load_wallet()
 
 
 class TradeRequest(BaseModel):
