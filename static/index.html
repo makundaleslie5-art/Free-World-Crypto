@@ -262,6 +262,7 @@ function updateEstimates(){
  document.getElementById("sellEstimate").textContent="Estimated proceeds: "+money((prices[s]||0)*Number(document.getElementById("sellQuantity").value||0));
 }
 
+let chartCache = {};
 let chartRange = "1H";
 
 function drawMarketChart() {
@@ -300,31 +301,43 @@ function drawMarketChart() {
   const volatility = chartRange === "1H" ? 0.008 :
                      chartRange === "4H" ? 0.015 : 0.025;
 
-  const candles = [];
-  let previous = currentPrice * (1 - volatility * 2);
+  const cacheKey = `${symbol}:${chartRange}:${currentPrice}`;
+  let candles;
+  let volumes;
 
-  for (let i = 0; i < count; i++) {
-    const open = previous;
-    const change = (Math.random() - 0.48) *
-                   currentPrice * volatility;
-    const close = Math.max(currentPrice * 0.01, open + change);
-    const high = Math.max(open, close) +
-                 Math.random() * currentPrice * volatility * 0.4;
-    const low = Math.max(0, Math.min(open, close) -
-                 Math.random() * currentPrice * volatility * 0.4);
+  if (chartCache.key === cacheKey) {
+    candles = chartCache.candles;
+    volumes = chartCache.volumes;
+  } else {
+    candles = [];
+    let previous = currentPrice * (1 - volatility * 2);
 
-    candles.push({ open, close, high, low });
-    previous = close;
+    for (let i = 0; i < count; i++) {
+      const open = previous;
+      const change = (Math.random() - 0.48) *
+                     currentPrice * volatility;
+      const close = Math.max(currentPrice * 0.01, open + change);
+      const high = Math.max(open, close) +
+                   Math.random() * currentPrice * volatility * 0.4;
+      const low = Math.max(0, Math.min(open, close) -
+                   Math.random() * currentPrice * volatility * 0.4);
+
+      candles.push({ open, close, high, low });
+      previous = close;
+    }
+
+    // Anchor the final candle to the configured sample price.
+    candles[candles.length - 1].close = currentPrice;
+    candles[candles.length - 1].high = Math.max(
+      candles[candles.length - 1].high, currentPrice
+    );
+    candles[candles.length - 1].low = Math.min(
+      candles[candles.length - 1].low, currentPrice
+    );
+
+    volumes = candles.map(() => Math.random() * 100 + 10);
+    chartCache = { key: cacheKey, candles, volumes };
   }
-
-  // Anchor the final candle to the configured sample price.
-  candles[candles.length - 1].close = currentPrice;
-  candles[candles.length - 1].high = Math.max(
-    candles[candles.length - 1].high, currentPrice
-  );
-  candles[candles.length - 1].low = Math.min(
-    candles[candles.length - 1].low, currentPrice
-  );
 
   const maxPrice = Math.max(...candles.map(c => c.high));
   const minPrice = Math.min(...candles.map(c => c.low));
@@ -400,7 +413,7 @@ function drawMarketChart() {
   const volumeTop = plotBottom + 10;
   const volumeBottom = height - 25;
   const volumeHeight = volumeBottom - volumeTop;
-  const volumes = candles.map(() => Math.random() * 100 + 10);
+  // Reuse the cached simulated volumes.
   const maxVolume = Math.max(...volumes);
 
   candles.forEach((candle, i) => {
@@ -422,12 +435,15 @@ function drawMarketChart() {
   ctx.font = "10px Arial";
   ctx.textAlign = "center";
 
-  const timeLabels = ["Start", chartRange, "Now"];
+  const timeLabels = chartRange === "1H"
+    ? ["1 hour ago", "30 min ago", "Now"]
+    : chartRange === "4H"
+    ? ["4 hours ago", "2 hours ago", "Now"]
+    : ["24 hours ago", "12 hours ago", "Now"];
 
   ctx.fillText(timeLabels[0], left, height - 5);
   ctx.fillText(timeLabels[1], left + plotWidth / 2, height - 5);
   ctx.fillText(timeLabels[2], left + plotWidth, height - 5);
-
   ctx.fillStyle = "#f0b90b";
   ctx.textAlign = "left";
 ctx.fillText(symbol + " / USD", left, plotBottom - 5);
