@@ -50,6 +50,13 @@ input,select{width:100%;padding:12px;background:var(--bg);border:1px solid #474d
 .stat-line{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
 .vip-card{border-color:#6b5712;background:linear-gradient(135deg,#211d10,#161a1e)}
 #message{padding:12px;border-radius:8px;background:#20252b;color:var(--gold);margin:16px 0;overflow-wrap:anywhere}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 280px;
+}
+
 footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid var(--border);font-size:12px}
 @media(max-width:600px){header{padding:14px 4%}nav{width:100%;display:grid;grid-template-columns:repeat(4,1fr)}nav button{padding:10px 3px;font-size:12px}main{padding:22px 4%}.hero{padding:22px}.card,.panel,.form-panel{padding:15px}.big{font-size:22px}}
 </style>
@@ -95,7 +102,41 @@ footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid va
 
   <section class="page" id="markets">
     <div class="section-head"><div><h2>Markets</h2><p class="muted">Explore available demo trading pairs.</p></div><span class="pill">SAMPLE PRICES</span></div>
-    <div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Pair</th><th>Price (USD)</th><th>Action</th></tr></thead><tbody id="marketRows"><tr><td colspan="4">Loading markets...</td></tr></tbody></table></div>
+
+    <div class="panel" style="margin-bottom:18px">
+      <div class="section-head" style="margin-top:0">
+        <div>
+          <h3 class="gold">Market price chart</h3>
+          <p class="muted">Illustrative simulated price history</p>
+        </div>
+        <select id="chartSymbol" aria-label="Select chart asset" style="max-width:220px">
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="SOL">Solana (SOL)</option>
+          <option value="FREE">Free World (FREE)</option>
+        </select>
+      </div>
+      <div class="grid" style="margin-bottom:12px">
+        <div>
+          <div class="label">Current sample price</div>
+          <div class="big gold" id="chartPrice">$—</div>
+        </div>
+        <div>
+          <div class="label">Chart period</div>
+          <div class="tabs">
+            <button type="button" class="primary" data-range="1H">1H</button>
+            <button type="button" class="primary" data-range="4H">4H</button>
+            <button type="button" class="primary" data-range="1D">1D</button>
+          </div>
+        </div>
+      </div>
+      <div style="width:100%;height:280px">
+        <canvas id="marketChart" aria-label="Simulated candlestick chart"></canvas>
+      </div>
+      <p class="notice">Demo visualization only. Candles are generated for illustration and are not real historical prices.</p>
+    </div>
+    
+<div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Pair</th><th>Price (USD)</th><th>Action</th></tr></thead><tbody id="marketRows"><tr><td colspan="4">Loading markets...</td></tr></tbody></table></div>
     <p class="notice">Prices are configured examples. They are not live market quotes or investment advice.</p>
   </section>
 
@@ -220,11 +261,157 @@ function updateEstimates(){
  document.getElementById("buyEstimate").textContent="Estimated cost: "+money((prices[b]||0)*Number(document.getElementById("buyQuantity").value||0));
  document.getElementById("sellEstimate").textContent="Estimated proceeds: "+money((prices[s]||0)*Number(document.getElementById("sellQuantity").value||0));
 }
+
+let chartRange = "1H";
+
+function drawMarketChart() {
+  const canvas = document.getElementById("marketChart");
+  const selector = document.getElementById("chartSymbol");
+  const priceLabel = document.getElementById("chartPrice");
+
+  if (!canvas || !selector || !priceLabel) return;
+
+  const symbol = selector.value;
+  const currentPrice = Number(prices[symbol] || 0);
+  priceLabel.textContent = money(currentPrice);
+
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width < 10) return;
+
+  const width = rect.width;
+  const height = rect.height;
+  const ratio = window.devicePixelRatio || 1;
+
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  if (!currentPrice) {
+    ctx.fillStyle = "#848e9c";
+    ctx.fillText("Waiting for sample prices...", 15, 30);
+    return;
+  }
+
+  const count = chartRange === "1H" ? 18 :
+                chartRange === "4H" ? 24 : 30;
+  const volatility = chartRange === "1H" ? 0.008 :
+                     chartRange === "4H" ? 0.015 : 0.025;
+
+  const candles = [];
+  let previous = currentPrice * (1 - volatility * 2);
+
+  for (let i = 0; i < count; i++) {
+    const open = previous;
+    const change = (Math.random() - 0.48) *
+                   currentPrice * volatility;
+    const close = Math.max(currentPrice * 0.01, open + change);
+    const high = Math.max(open, close) +
+                 Math.random() * currentPrice * volatility * 0.4;
+    const low = Math.max(0, Math.min(open, close) -
+                 Math.random() * currentPrice * volatility * 0.4);
+
+    candles.push({ open, close, high, low });
+    previous = close;
+  }
+
+  // Anchor the final candle to the configured sample price.
+  candles[candles.length - 1].close = currentPrice;
+  candles[candles.length - 1].high = Math.max(
+    candles[candles.length - 1].high, currentPrice
+  );
+  candles[candles.length - 1].low = Math.min(
+    candles[candles.length - 1].low, currentPrice
+  );
+
+  const maxPrice = Math.max(...candles.map(c => c.high));
+  const minPrice = Math.min(...candles.map(c => c.low));
+  const spread = Math.max(maxPrice - minPrice, currentPrice * 0.001);
+  const top = maxPrice + spread * 0.12;
+  const bottom = minPrice - spread * 0.12;
+
+  const left = 12;
+  const right = 78;
+  const plotTop = 12;
+  const plotBottom = height - 22;
+  const plotWidth = width - left - right;
+  const plotHeight = plotBottom - plotTop;
+
+  const y = price =>
+    plotTop + ((top - price) / (top - bottom)) * plotHeight;
+
+  // Horizontal grid lines and price labels.
+  ctx.font = "11px Arial";
+  ctx.textAlign = "left";
+
+  for (let i = 0; i <= 4; i++) {
+    const value = top - (top - bottom) * i / 4;
+    const yy = y(value);
+
+    ctx.strokeStyle = "#2b3139";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(left, yy);
+    ctx.lineTo(width - right + 4, yy);
+    ctx.stroke();
+
+    ctx.fillStyle = "#848e9c";
+    ctx.fillText(
+      value.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      width - right + 10,
+      yy + 4
+    );
+  }
+
+  const slot = plotWidth / candles.length;
+  const bodyWidth = Math.max(3, slot * 0.58);
+
+  candles.forEach((candle, i) => {
+    const x = left + slot * i + slot / 2;
+    const rising = candle.close >= candle.open;
+    const color = rising ? "#0ecb81" : "#f6465d";
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y(candle.high));
+    ctx.lineTo(x, y(candle.low));
+    ctx.stroke();
+
+    const bodyTop = y(Math.max(candle.open, candle.close));
+    const bodyBottom = y(Math.min(candle.open, candle.close));
+    const bodyHeight = Math.max(2, bodyBottom - bodyTop);
+
+    ctx.fillStyle = color;
+    ctx.fillRect(
+      x - bodyWidth / 2,
+      bodyTop,
+      bodyWidth,
+      bodyHeight
+    );
+  });
+
+  ctx.fillStyle = "#f0b90b";
+  ctx.textAlign = "left";
+  ctx.fillText(symbol + " / USD", left, height - 5);
+}
+
+function selectChartRange(range) {
+  chartRange = range;
+  document.querySelectorAll("[data-range]").forEach(button => {
+    button.style.opacity =
+      button.dataset.range === range ? "1" : "0.55";
+  });
+  drawMarketChart();
+}
+
 async function refreshAll(){
  try{
   const [marketData,walletData]=await Promise.all([api("/market/prices"),api("/wallet")]);
   prices={};(marketData.prices||[]).forEach(item=>prices[item.symbol]=Number(item.price));
-  wallet=walletData;renderMarkets();renderWallet();
+wallet=walletData;renderMarkets();renderWallet();drawMarketChart();
   showMessage("Demo exchange connected. Wallet and markets updated.");
  }catch(error){showMessage("Connection error: "+error.message+" Check that the API server is running.");}
 }
@@ -258,6 +445,23 @@ document.addEventListener("click",event=>{
   updateEstimates();
  }
 });
+
+document.getElementById("chartSymbol").addEventListener("change", drawMarketChart);
+
+document.querySelectorAll("[data-range]").forEach(button => {
+  button.addEventListener("click", () => {
+    selectChartRange(button.dataset.range);
+  });
+});
+
+window.addEventListener("resize", drawMarketChart);
+
+document.querySelectorAll('nav button[data-page="markets"]').forEach(button => {
+  button.addEventListener("click", () => {
+    setTimeout(drawMarketChart, 0);
+  });
+});
+
 document.getElementById("buyForm").addEventListener("submit",event=>{
  event.preventDefault();const quantity=Number(document.getElementById("buyQuantity").value);
  if(Number.isFinite(quantity)&&quantity>0)trade("buy",document.getElementById("buySymbol").value,quantity);
