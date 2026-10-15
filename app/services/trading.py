@@ -64,13 +64,21 @@ def buy(symbol: str, quantity: float):
         raise ValueError("Quantity must be greater than zero.")
 
     with wallet_lock:
-        cost = PRICES[symbol] * quantity
-        cost = round(cost, 2)
-
-        if cost > wallet["available_balance"]:
-            raise ValueError("Insufficient demo USD balance.")
+        cost = round(PRICES[symbol] * quantity, 2)
 
         with get_connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+
+            balance_row = connection.execute(
+                "SELECT available_balance FROM wallet WHERE id = 1"
+            ).fetchone()
+
+            if balance_row is None:
+                raise RuntimeError("Wallet is not initialized.")
+
+            if cost > balance_row["available_balance"]:
+                raise ValueError("Insufficient demo USD balance.")
+
             connection.execute(
                 "UPDATE wallet SET available_balance = "
                 "ROUND(available_balance - ?, 2) WHERE id = 1",
@@ -113,15 +121,23 @@ def sell(symbol: str, quantity: float):
         raise ValueError("Quantity must be greater than zero.")
 
     with wallet_lock:
-        owned = wallet["holdings"].get(symbol, 0.0)
-
-        if quantity > owned:
-            raise ValueError("Insufficient crypto holdings.")
-
         proceeds = round(PRICES[symbol] * quantity, 2)
-        remaining = owned - quantity
 
         with get_connection() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+
+            holding_row = connection.execute(
+                "SELECT quantity FROM holdings WHERE symbol = ?",
+                (symbol,),
+            ).fetchone()
+
+            owned = holding_row["quantity"] if holding_row else 0.0
+
+            if quantity > owned:
+                raise ValueError("Insufficient crypto holdings.")
+
+            remaining = owned - quantity
+
             connection.execute(
                 "UPDATE wallet SET available_balance = "
                 "ROUND(available_balance + ?, 2) WHERE id = 1",
