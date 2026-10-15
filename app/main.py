@@ -25,12 +25,7 @@ class TradeRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {
-        "message": "Welcome to Free World Crypto!",
-        "status": "under development",
-        "mode": "simulation only",
-    }
-
+    return FileResponse("static/index.html")
 
 @app.get("/health")
 def health_check():

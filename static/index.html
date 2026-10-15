@@ -335,7 +335,7 @@ function drawMarketChart() {
   const left = 12;
   const right = 78;
   const plotTop = 12;
-  const plotBottom = height - 22;
+  const plotBottom = height - 75;
   const plotWidth = width - left - right;
   const plotHeight = plotBottom - plotTop;
 
@@ -392,10 +392,45 @@ function drawMarketChart() {
       bodyHeight
     );
   });
+  // Simulated trading volume bars
+  ctx.fillStyle = "#848e9c";
+  ctx.font = "10px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText("VOLUME (SIMULATED)", left, plotBottom + 8);
+  const volumeTop = plotBottom + 10;
+  const volumeBottom = height - 25;
+  const volumeHeight = volumeBottom - volumeTop;
+  const volumes = candles.map(() => Math.random() * 100 + 10);
+  const maxVolume = Math.max(...volumes);
+
+  candles.forEach((candle, i) => {
+    const x = left + slot * i + slot / 2;
+    const barHeight = (volumes[i] / maxVolume) * volumeHeight;
+    const rising = candle.close >= candle.open;
+
+    ctx.fillStyle = rising ? "#0ecb81" : "#f6465d";
+    ctx.fillRect(
+      x - bodyWidth / 2,
+      volumeBottom - barHeight,
+      bodyWidth,
+      barHeight
+    );
+  });
+
+  // Time labels along the bottom
+  ctx.fillStyle = "#848e9c";
+  ctx.font = "10px Arial";
+  ctx.textAlign = "center";
+
+  const timeLabels = ["Start", chartRange, "Now"];
+
+  ctx.fillText(timeLabels[0], left, height - 5);
+  ctx.fillText(timeLabels[1], left + plotWidth / 2, height - 5);
+  ctx.fillText(timeLabels[2], left + plotWidth, height - 5);
 
   ctx.fillStyle = "#f0b90b";
   ctx.textAlign = "left";
-  ctx.fillText(symbol + " / USD", left, height - 5);
+ctx.fillText(symbol + " / USD", left, plotBottom - 5);
 }
 
 function selectChartRange(range) {
