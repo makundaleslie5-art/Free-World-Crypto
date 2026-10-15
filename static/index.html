@@ -4,286 +4,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FREE WORLD CRYPTO</title>
+<title>FREE WORLD | Crypto Exchange</title>
 <style>
+:root{--bg:#0b0e11;--panel:#161a1e;--border:#2b3139;--gold:#f0b90b;--text:#eaecef;--muted:#848e9c;--green:#0ecb81;--red:#f6465d}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#f5f7ff}
-header{padding:22px 6%;background:#121a30;border-bottom:1px solid #263452}
-header h1{margin:0;color:#35e0a1;letter-spacing:2px}
-header p,.muted{color:#aab6d3}
-main{max-width:1150px;margin:auto;padding:28px 20px}
-.status{display:inline-block;padding:8px 12px;border-radius:20px;background:#183b35;color:#6cf0bd;font-size:12px}
-h2{margin-top:28px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
-.card,.panel{background:#121a30;border:1px solid #263452;border-radius:14px;padding:20px}
-.card h3{margin-top:0;color:#aab6d3;font-size:14px}
-.big{font-size:26px;font-weight:bold;margin:12px 0}
-.green{color:#35e0a1}
-label{display:block;margin:14px 0 6px;color:#aab6d3}
-input,select{width:100%;padding:12px;background:#0b1020;color:#fff;border:1px solid #354463;border-radius:8px}
-button{background:#35e0a1;color:#08131a;border:0;border-radius:8px;padding:12px 16px;font-weight:bold;cursor:pointer;margin-top:14px}
-button:hover{background:#70f5c3}
-.secondary{background:#263452;color:#fff}
-.forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #263452;overflow-wrap:anywhere}
-th{color:#aab6d3;font-size:13px}
-.notice{color:#aab6d3;font-size:13px}
-#message{margin-top:14px;overflow-wrap:anywhere}
-footer{text-align:center;padding:25px;color:#8794b3;font-size:13px}
-@media(max-width:500px){main{padding:20px 12px}.big{font-size:22px}.panel{padding:15px}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--border);padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:bold;color:var(--gold);letter-spacing:1px}
+.tagline{font-size:11px;color:var(--muted);margin-top:5px}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav button{background:transparent;color:var(--muted);border:0;padding:11px 14px;border-radius:7px;cursor:pointer;font-weight:bold}
+nav button.active,nav button:hover{background:var(--gold);color:#111}
+main{max-width:1200px;margin:auto;padding:28px 5%}
+.page{display:none}.page.active{display:block}
+h1,h2,h3{margin-top:0}
+h2{font-size:24px}
+h3{font-size:15px}
+.muted,.notice{color:var(--muted)}
+.notice{font-size:12px;line-height:1.6}
+.gold{color:var(--gold)}.green{color:var(--green)}
+.hero{padding:30px;border:1px solid #5a4810;border-radius:14px;background:linear-gradient(120deg,#201b0a,#161a1e 65%);margin-bottom:20px}
+.hero h1{font-size:clamp(28px,5vw,44px);margin-bottom:12px}
+.hero p{color:#c6cbd2;line-height:1.7;max-width:650px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:18px 0 28px}
+.card,.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;min-width:0}
+.label{font-size:12px;color:var(--muted);margin-bottom:12px}
+.big{font-size:25px;font-weight:bold;overflow-wrap:anywhere}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:28px 0 14px}
+button.primary{background:var(--gold);color:#111;border:0;border-radius:7px;padding:12px 16px;font-weight:bold;cursor:pointer}
+button.primary:hover{background:#ffd84d}
+button:disabled{opacity:.5;cursor:not-allowed}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-block;padding:7px 10px;background:#2b2612;color:var(--gold);border-radius:20px;font-size:11px;font-weight:bold}
+table{width:100%;border-collapse:collapse;min-width:460px}
+th,td{text-align:left;padding:14px 10px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted);font-weight:normal}
+.table-wrap{overflow-x:auto}
+.coin{display:flex;align-items:center;gap:10px}
+.coin-icon{background:#292d33;color:var(--gold);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:bold}
+label{display:block;color:var(--muted);font-size:13px;margin:14px 0 7px}
+input,select{width:100%;padding:12px;background:var(--bg);border:1px solid #474d57;border-radius:7px;color:var(--text)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.form-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+.full{width:100%;margin-top:16px}
+.stat-line{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.vip-card{border-color:#6b5712;background:linear-gradient(135deg,#211d10,#161a1e)}
+#message{padding:12px;border-radius:8px;background:#20252b;color:var(--gold);margin:16px 0;overflow-wrap:anywhere}
+footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid var(--border);font-size:12px}
+@media(max-width:600px){header{padding:14px 4%}nav{width:100%;display:grid;grid-template-columns:repeat(4,1fr)}nav button{padding:10px 3px;font-size:12px}main{padding:22px 4%}.hero{padding:22px}.card,.panel,.form-panel{padding:15px}.big{font-size:22px}}
 </style>
 </head>
 <body>
 <header>
-<h1>FREE WORLD CRYPTO</h1>
-<p>Your crypto journey starts here.</p>
-<span class="status">● SIMULATION MODE</span>
+  <div>
+    <div class="brand">◆ FREE WORLD</div>
+    <div class="tagline">CRYPTO EXCHANGE · DEMO PLATFORM</div>
+  </div>
+  <nav aria-label="Main navigation">
+    <button class="active" data-page="home">Home</button>
+    <button data-page="markets">Markets</button>
+    <button data-page="trades">Trades</button>
+    <button data-page="wallets">Wallets</button>
+  </nav>
 </header>
 
 <main>
-<h2>Overview</h2>
-<p class="muted">Welcome to your demo trading dashboard.</p>
+  <div id="message" role="status">Connecting to the demo exchange...</div>
 
-<section class="grid">
-<div class="card">
-<h3>AVAILABLE BALANCE</h3>
-<div class="big green" id="balance">$—</div>
-<div class="notice">Demo USD funds</div>
-</div>
-<div class="card">
-<h3>CRYPTO ASSETS</h3>
-<div class="big" id="assetCount">—</div>
-<div class="notice">Currencies held</div>
-</div>
-<div class="card">
-<h3>TRANSACTIONS</h3>
-<div class="big" id="txCount">—</div>
-<div class="notice">Recorded demo trades</div>
-</div>
-</section>
+  <section class="page active" id="home">
+    <div class="hero">
+      <span class="pill">WELCOME TO FREE WORLD</span>
+      <h1>Explore crypto.<br><span class="gold">Imagine a freer world.</span></h1>
+      <p>Discover digital assets in our simulated crypto exchange. Learn how markets, trading, and portfolio management work with demo funds.</p>
+      <button class="primary" data-go="markets">Explore markets →</button>
+    </div>
+    <div class="section-head"><h2>Account overview</h2><span class="pill">SIMULATION MODE</span></div>
+    <div class="grid">
+      <div class="card"><div class="label">Available demo USD</div><div class="big gold" id="homeBalance">$—</div><div class="notice">Funds available for simulated buys</div></div>
+      <div class="card"><div class="label">Portfolio value</div><div class="big" id="homePortfolio">$—</div><div class="notice">Cash plus estimated demo holdings</div></div>
+      <div class="card"><div class="label">Assets held</div><div class="big" id="homeAssets">—</div><div class="notice">Different currencies in your wallet</div></div>
+      <div class="card vip-card"><div class="label">Your membership</div><div class="big gold" id="homeVip">VIP —</div><div class="notice" id="homeVipNote">Based on simulated portfolio value</div></div>
+    </div>
+    <div class="section-head"><h2>Popular markets</h2><button class="primary" data-go="markets">View all markets</button></div>
+    <div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Symbol</th><th>Sample price</th></tr></thead><tbody id="homeMarket"><tr><td colspan="3">Loading markets...</td></tr></tbody></table></div>
+    <div class="hero" style="margin-top:24px">
+      <h2 class="gold">Our vision: a world with more freedom</h2>
+      <p>FREE WORLD is a community-themed project about connection, opportunity, and standing against racism based on skin colour. This website is a demo platform, not a live exchange.</p>
+    </div>
+  </section>
 
-<h2>Market Overview</h2>
-<section class="grid" id="market">
-<div class="card">Loading market prices...</div>
-</section>
+  <section class="page" id="markets">
+    <div class="section-head"><div><h2>Markets</h2><p class="muted">Explore available demo trading pairs.</p></div><span class="pill">SAMPLE PRICES</span></div>
+    <div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Pair</th><th>Price (USD)</th><th>Action</th></tr></thead><tbody id="marketRows"><tr><td colspan="4">Loading markets...</td></tr></tbody></table></div>
+    <p class="notice">Prices are configured examples. They are not live market quotes or investment advice.</p>
+  </section>
 
-<h2>Demo Trading</h2>
-<section class="forms">
-<div class="panel">
-<h3>Buy Cryptocurrency</h3>
-<form id="buyForm">
-<label for="buySymbol">Cryptocurrency</label>
-<select id="buySymbol">
-<option value="BTC">Bitcoin (BTC)</option>
-<option value="ETH" selected>Ethereum (ETH)</option>
-<option value="SOL">Solana (SOL)</option>
-<option value="FREE">Free World (FREE)</option>
-</select>
-<label for="buyQuantity">Quantity to buy</label>
-<input id="buyQuantity" type="number" min="0.00000001" step="any" value="0.01" required>
-<button type="submit">Buy with Demo Funds</button>
-</form>
-<div class="card">
-<h3>TRANSACTIONS</h3>
-<div class="big" id="txCount">—</div>
-<div class="notice">Recorded demo trades</div>
-</div>
+  <section class="page" id="trades">
+    <div class="section-head"><div><h2>Demo trading</h2><p class="muted">Buy or sell using simulated balances only.</p></div><span class="pill">NO REAL MONEY</span></div>
+    <div class="grid">
+      <div class="card"><div class="label">Available balance</div><div class="big gold" id="tradeBalance">$—</div></div>
+      <div class="card"><div class="label">Portfolio value</div><div class="big" id="tradePortfolio">$—</div></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-panel">
+        <h3 class="green">Buy cryptocurrency</h3>
+        <form id="buyForm">
+          <label for="buySymbol">Asset</label><select id="buySymbol"></select>
+          <label for="buyQuantity">Quantity to buy</label><input id="buyQuantity" type="number" min="0.00000001" step="any" value="1" required>
+          <div class="notice" id="buyEstimate">Estimated cost: —</div>
+          <button class="primary full" type="submit">Buy with demo funds</button>
+        </form>
+      </div>
+      <div class="form-panel">
+        <h3 class="gold">Sell cryptocurrency</h3>
+        <form id="sellForm">
+          <label for="sellSymbol">Asset</label><select id="sellSymbol"></select>
+          <label for="sellQuantity">Quantity to sell</label><input id="sellQuantity" type="number" min="0.00000001" step="any" value="1" required>
+          <div class="notice" id="sellEstimate">Estimated proceeds: —</div>
+          <button class="primary full" type="submit">Sell demo holdings</button>
+        </form>
+      </div>
+    </div>
+    <div class="section-head"><h2>Recent orders</h2></div>
+    <div class="panel table-wrap"><table><thead><tr><th>Side</th><th>Asset</th><th>Quantity</th><th>Total (USD)</th></tr></thead><tbody id="tradeTransactions"><tr><td colspan="4">Loading transactions...</td></tr></tbody></table></div>
+  </section>
 
-<div class="card">
-<h3>CRYPTO HOLDINGS VALUE</h3>
-<div class="big" id="holdingsValue">$0.00</div>
-<div class="notice">Simulated coin value</div>
-</div>
-
-<div class="card">
-<h3>TOTAL PORTFOLIO VALUE</h3>
-<div class="big green" id="portfolioValue">$10,000.00</div>
-<div class="notice">Balance + crypto value</div>
-</div>
-
-<div class="card">
-<h3>SIMULATED PROFIT / LOSS</h3>
-<div class="big" id="profitLoss">$0.00</div>
-<div class="notice">Compared with $10,000 starting funds</div>
-</div>
-</section>
-</div>
-<div class="panel">
-<h3>Sell Cryptocurrency</h3>
-<form id="sellForm">
-<label for="sellSymbol">Cryptocurrency</label>
-<select id="sellSymbol">
-<option value="BTC">Bitcoin (BTC)</option>
-<option value="ETH" selected>Ethereum (ETH)</option>
-<option value="SOL">Solana (SOL)</option>
-<option value="FREE">Free World (FREE)</option>
-</select>
-<label for="sellQuantity">Quantity to sell</label>
-<input id="sellQuantity" type="number" min="0.00000001" step="any" value="0.005" required>
-<button type="submit">Sell Demo Holdings</button>
-</form>
-</div>
-</section>
-
-<div class="panel">
-<button class="secondary" id="refresh">Refresh Wallet and Prices</button>
-<p id="message" role="status">Connecting to your API...</p>
-<p class="notice">Demo trading only. Prices are sample values and may not reflect real markets.</p>
-</div>
-
-<h2>Your Holdings</h2>
-<div class="panel">
-<table>
-<thead><tr><th>Asset</th><th>Quantity</th></tr></thead>
-<tbody id="holdings"><tr><td colspan="2">Loading...</td></tr></tbody>
-</table>
-</div>
-
-<h2>Transaction History</h2>
-<div class="panel">
-<table>
-<thead><tr><th>Type</th><th>Asset</th><th>Quantity</th><th>Total USD</th></tr></thead>
-<tbody id="transactions"><tr><td colspan="4">Loading...</td></tr></tbody>
-</table>
-</div>
+  <section class="page" id="wallets">
+    <div class="section-head"><div><h2>My wallets</h2><p class="muted">Your simulated cash and cryptocurrency holdings.</p></div><span class="pill">DEMO WALLET</span></div>
+    <div class="grid">
+      <div class="card"><div class="label">Available demo USD</div><div class="big gold" id="walletBalance">$—</div></div>
+      <div class="card"><div class="label">Crypto holdings value</div><div class="big" id="walletCrypto">$—</div></div>
+      <div class="card"><div class="label">Total portfolio value</div><div class="big gold" id="walletPortfolio">$—</div></div>
+      <div class="card"><div class="label">Simulated profit / loss</div><div class="big" id="walletPnL">$—</div></div>
+    </div>
+    <div class="section-head"><h2>Current holdings</h2></div>
+    <div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Quantity</th><th>Sample price</th><th>Value (USD)</th></tr></thead><tbody id="holdingRows"><tr><td colspan="4">Loading holdings...</td></tr></tbody></table></div>
+    <div class="section-head"><h2>Transaction history</h2></div>
+    <div class="panel table-wrap"><table><thead><tr><th>Side</th><th>Asset</th><th>Quantity</th><th>Price</th><th>Total (USD)</th></tr></thead><tbody id="walletTransactions"><tr><td colspan="5">Loading transactions...</td></tr></tbody></table></div>
+    <div class="section-head"><h2>VIP membership</h2></div>
+    <div class="panel vip-card"><div class="label">Current simulated portfolio tier</div><div class="big gold" id="walletVip">VIP —</div><p id="walletVipNote" class="notice">Membership is based on portfolio value in this demo.</p><div id="vipLevels"></div></div>
+  </section>
 </main>
 
-<footer>FREE WORLD CRYPTO · Development Version · Simulation Only</footer>
+<footer>FREE WORLD CRYPTO · Development demo · Sample prices and demo funds only · No real deposits or withdrawals</footer>
 
 <script>
-const names = {
- BTC: "Bitcoin",
- ETH: "Ethereum",
- SOL: "Solana",
- FREE: "Free World"
-};
+const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",FREE:"Free World"};
+const money=n=>"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const qty=n=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:8});
+let prices={},wallet={available_balance:0,holdings:{},transactions:[]},busy=false;
 
-const money = value => "$" + Number(value).toLocaleString("en-US", {
- minimumFractionDigits: 2,
- maximumFractionDigits: 2
-});
-
-async function api(path, options = {}) {
- const response = await fetch(path, options);
- const data = await response.json();
- if (!response.ok) {
-  throw new Error(data.detail || "The request failed.");
- }
+function showMessage(text){document.getElementById("message").textContent=text}
+async function api(path,options={}){
+ const response=await fetch(path,options);
+ let data;
+ try{data=await response.json()}catch{throw new Error("The server returned an unexpected response.")}
+ if(!response.ok)throw new Error(data.detail||"Request failed.");
  return data;
 }
-
-async function loadMarket() {
- const market = document.getElementById("market");
- try {
-  const data = await api("/market/prices");
-  market.innerHTML = data.prices.map(coin => `
-   <article class="card">
-    <h3>${names[coin.symbol] || coin.symbol}</h3>
-    <div class="big">${money(coin.price)}</div>
-    <div class="green">${coin.symbol}</div>
-   </article>
-  `).join("");
- } catch (error) {
-  market.innerHTML = "<div class='card'>Could not load market prices.</div>";
+function portfolioValue(){
+ return Number(wallet.available_balance||0)+Object.entries(wallet.holdings||{}).reduce((sum,[symbol,amount])=>sum+Number(amount)*(prices[symbol]||0),0);
+}
+function vipLevel(value){
+ if(value<=200)return 1;
+ if(value<=500)return 2;
+ if(value<=1000)return 3;
+ if(value<=5000)return 4;
+ return 5;
+}
+function vipDescription(level){
+ return ({1:"Starter",2:"Silver",3:"Gold",4:"Platinum",5:"Elite"})[level];
+}
+function assetRow(symbol){
+ return `<div class="coin"><div class="coin-icon">${symbol.slice(0,1)}</div><div><strong>${names[symbol]||symbol}</strong><div class="notice">${symbol}</div></div></div>`;
+}
+function renderMarkets(){
+ const entries=Object.entries(prices);
+ const rows=entries.map(([symbol,price])=>`<tr><td>${assetRow(symbol)}</td><td>${symbol}/USD</td><td>${money(price)}</td><td><button class="primary" data-trade="${symbol}">Trade</button></td></tr>`).join("");
+ document.getElementById("marketRows").innerHTML=rows||'<tr><td colspan="4">No markets available.</td></tr>';
+ document.getElementById("homeMarket").innerHTML=entries.map(([symbol,price])=>`<tr><td>${names[symbol]||symbol}</td><td>${symbol}</td><td>${money(price)}</td></tr>`).join("")||'<tr><td colspan="3">No markets available.</td></tr>';
+ const options=entries.map(([symbol])=>`<option value="${symbol}">${names[symbol]||symbol} (${symbol})</option>`).join("");
+ document.getElementById("buySymbol").innerHTML=options;
+ document.getElementById("sellSymbol").innerHTML=options;
+}
+function renderWallet(){
+ const total=portfolioValue(),crypto=total-Number(wallet.available_balance||0),level=vipLevel(total);
+ const holdings=Object.entries(wallet.holdings||{}).filter(([,amount])=>Number(amount)>0);
+ document.getElementById("homeBalance").textContent=money(wallet.available_balance);
+ document.getElementById("homePortfolio").textContent=money(total);
+ document.getElementById("homeAssets").textContent=holdings.length;
+ document.getElementById("homeVip").textContent="VIP "+level;
+ document.getElementById("homeVipNote").textContent=vipDescription(level)+" · Based on demo portfolio value";
+ document.getElementById("tradeBalance").textContent=money(wallet.available_balance);
+ document.getElementById("tradePortfolio").textContent=money(total);
+ document.getElementById("walletBalance").textContent=money(wallet.available_balance);
+ document.getElementById("walletCrypto").textContent=money(crypto);
+ document.getElementById("walletPortfolio").textContent=money(total);
+ const pnl=total-10000,pnlEl=document.getElementById("walletPnL");
+ pnlEl.textContent=(pnl>0?"+":pnl<0?"-":"")+money(Math.abs(pnl));
+ pnlEl.className="big "+(pnl>=0?"green":"");
+ document.getElementById("walletVip").textContent="VIP "+level+" · "+vipDescription(level);
+ document.getElementById("walletVipNote").textContent="Calculated from current demo portfolio value of "+money(total)+".";
+ document.getElementById("vipLevels").innerHTML=[
+  ["VIP 1","$0–$200"],["VIP 2","Above $200–$500"],["VIP 3","Above $500–$1,000"],["VIP 4","Above $1,000–$5,000"],["VIP 5","Above $5,000"]
+ ].map((v,i)=>`<div class="stat-line"><span class="${i+1===level?"gold":""}">${v[0]}${i+1===level?" · CURRENT":""}</span><span>${v[1]}</span></div>`).join("");
+ document.getElementById("holdingRows").innerHTML=holdings.length?holdings.map(([symbol,amount])=>`<tr><td>${names[symbol]||symbol} (${symbol})</td><td>${qty(amount)}</td><td>${money(prices[symbol]||0)}</td><td>${money(Number(amount)*(prices[symbol]||0))}</td></tr>`).join(""):'<tr><td colspan="4">No crypto holdings yet.</td></tr>';
+ const transactions=wallet.transactions||[];
+ const renderTx=transactions.length?[...transactions].reverse().map(tx=>`<tr><td class="${tx.side==="BUY"?"green":"gold"}">${tx.side}</td><td>${tx.symbol}</td><td>${qty(tx.quantity)}</td><td>${money(tx.price)}</td><td>${money(tx.total)}</td></tr>`).join(""):"";
+ document.getElementById("walletTransactions").innerHTML=renderTx||'<tr><td colspan="5">No transactions yet.</td></tr>';
+ document.getElementById("tradeTransactions").innerHTML=renderTx||'<tr><td colspan="4">No transactions yet.</td></tr>';
+ updateEstimates();
+}
+function updateEstimates(){
+ const b=document.getElementById("buySymbol").value,s=document.getElementById("sellSymbol").value;
+ document.getElementById("buyEstimate").textContent="Estimated cost: "+money((prices[b]||0)*Number(document.getElementById("buyQuantity").value||0));
+ document.getElementById("sellEstimate").textContent="Estimated proceeds: "+money((prices[s]||0)*Number(document.getElementById("sellQuantity").value||0));
+}
+async function refreshAll(){
+ try{
+  const [marketData,walletData]=await Promise.all([api("/market/prices"),api("/wallet")]);
+  prices={};(marketData.prices||[]).forEach(item=>prices[item.symbol]=Number(item.price));
+  wallet=walletData;renderMarkets();renderWallet();
+  showMessage("Demo exchange connected. Wallet and markets updated.");
+ }catch(error){showMessage("Connection error: "+error.message+" Check that the API server is running.");}
+}
+async function trade(side,symbol,quantity){
+ if(busy)return;
+ busy=true;
+ try{
+  const result=await api("/trade/"+side,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symbol,quantity})});
+  await refreshAll();
+  showMessage(result.message||"Simulated "+side+" completed successfully.");
+ }catch(error){showMessage("Trade failed: "+error.message);}
+ finally{busy=false;}
+}
+document.querySelectorAll("nav button[data-page]").forEach(button=>button.addEventListener("click",()=>{
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ button.classList.add("active");document.getElementById(button.dataset.page).classList.add("active");
+}));
+document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>{
+ const page=button.dataset.go;
+ document.querySelectorAll("nav button").forEach(b=>{b.classList.toggle("active",b.dataset.page===page)});
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===page));
+}));
+document.addEventListener("click",event=>{
+ const button=event.target.closest("[data-trade]");
+ if(button){
+  const symbol=button.dataset.trade;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page==="trades"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="trades"));
+  document.getElementById("buySymbol").value=symbol;
+  updateEstimates();
  }
-}
-
-async function loadWallet() {
- const wallet = await api("/wallet");
- document.getElementById("balance").textContent =
-  money(wallet.available_balance);
- const marketData = await api("/market/prices");
-
- const prices = {};
- marketData.prices.forEach(coin => {
-  prices[coin.symbol] = coin.price;
- });
-
- const holdings = Object.entries(wallet.holdings || {});
-
- const cryptoValue = holdings.reduce((total, [symbol, quantity]) => {
-  return total + quantity * (prices[symbol] || 0);
- }, 0);
-
- const portfolioValue = wallet.available_balance + cryptoValue;
- const profitLoss = portfolioValue - 10000;
-
- document.getElementById("holdingsValue").textContent =
-  money(cryptoValue);
-
- document.getElementById("portfolioValue").textContent =
-  money(portfolioValue);
-
- const profitElement = document.getElementById("profitLoss");
- profitElement.textContent =
-  (profitLoss >= 0 ? "+" : "-") + money(Math.abs(profitLoss));
- profitElement.className =
-  "big " + (profitLoss >= 0 ? "green" : "");
- document.getElementById("assetCount").textContent = holdings.length;
- document.getElementById("txCount").textContent =
-  (wallet.transactions || []).length;
-
- document.getElementById("holdings").innerHTML = holdings.length
-  ? holdings.map(([symbol, quantity]) => `
-    <tr><td>${names[symbol] || symbol} (${symbol})</td>
-    <td>${Number(quantity).toLocaleString("en-US",{maximumFractionDigits:8})}</td></tr>
-   `).join("")
-  : "<tr><td colspan='2'>No crypto holdings yet.</td></tr>";
-
- const transactions = wallet.transactions || [];
- document.getElementById("transactions").innerHTML = transactions.length
-  ? [...transactions].reverse().map(tx => `
-    <tr><td>${tx.side}</td><td>${tx.symbol}</td>
-    <td>${Number(tx.quantity).toLocaleString("en-US",{maximumFractionDigits:8})}</td>
-    <td>${money(tx.total)}</td></tr>
-   `).join("")
-  : "<tr><td colspan='4'>No transactions yet.</td></tr>";
-}
-
-async function refreshDashboard() {
- const message = document.getElementById("message");
- message.textContent = "Refreshing dashboard...";
- try {
-  await Promise.all([loadMarket(), loadWallet()]);
-  message.textContent = "Dashboard updated successfully.";
- } catch (error) {
-  message.textContent = "Could not load wallet: " + error.message;
- }
-}
-
-async function trade(side, symbol, quantity) {
- const message = document.getElementById("message");
- message.textContent = "Processing simulated trade...";
- try {
-  const result = await api("/trade/" + side, {
-   method: "POST",
-   headers: {"Content-Type": "application/json"},
-   body: JSON.stringify({symbol, quantity})
-  });
-  message.textContent = result.message;
-  await refreshDashboard();
- } catch (error) {
-  message.textContent = "Trade failed: " + error.message;
- }
-}
-
-document.getElementById("buyForm").addEventListener("submit", event => {
- event.preventDefault();
- const symbol = document.getElementById("buySymbol").value;
- const quantity = Number(document.getElementById("buyQuantity").value);
- if (Number.isFinite(quantity) && quantity > 0) trade("buy", symbol, quantity);
 });
-
-document.getElementById("sellForm").addEventListener("submit", event => {
- event.preventDefault();
- const symbol = document.getElementById("sellSymbol").value;
- const quantity = Number(document.getElementById("sellQuantity").value);
- if (Number.isFinite(quantity) && quantity > 0) trade("sell", symbol, quantity);
+document.getElementById("buyForm").addEventListener("submit",event=>{
+ event.preventDefault();const quantity=Number(document.getElementById("buyQuantity").value);
+ if(Number.isFinite(quantity)&&quantity>0)trade("buy",document.getElementById("buySymbol").value,quantity);
 });
-
-document.getElementById("refresh").addEventListener("click", refreshDashboard);
-refreshDashboard();
+document.getElementById("sellForm").addEventListener("submit",event=>{
+ event.preventDefault();const quantity=Number(document.getElementById("sellQuantity").value);
+ if(Number.isFinite(quantity)&&quantity>0)trade("sell",document.getElementById("sellSymbol").value,quantity);
+});
+["buySymbol","buyQuantity","sellSymbol","sellQuantity"].forEach(id=>document.getElementById(id).addEventListener("input",updateEstimates));
+refreshAll();
 </script>
 </body>
 </html>
