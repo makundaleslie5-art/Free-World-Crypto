@@ -76,10 +76,50 @@ footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid va
     <button data-page="markets">Markets</button>
     <button data-page="trades">Trades</button>
     <button data-page="wallets">Wallets</button>
+    <button type="button" id="logoutButton">Logout</button>
   </nav>
 </header>
 
 <main>
+  <section class="page" id="authPanel">
+    <div class="hero">
+      <span class="pill">FREE WORLD ACCOUNT</span>
+      <h1>Welcome to <span class="gold">Free World.</span></h1>
+      <p>Create an account or log in to access your own simulated wallet. No real money is used.</p>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-panel">
+        <h3 class="green">Create account</h3>
+        <form id="registerForm">
+          <label for="registerEmail">Email address</label>
+          <input id="registerEmail" type="email" autocomplete="email" maxlength="254" required>
+
+          <label for="registerPassword">Login password (minimum 12 characters)</label>
+          <input id="registerPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+
+          <label for="registerFundsPassword">Separate funds password (minimum 12 characters)</label>
+          <input id="registerFundsPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+
+          <button class="primary full" type="submit">Create account</button>
+        </form>
+      </div>
+
+      <div class="form-panel">
+        <h3 class="gold">Log in</h3>
+        <form id="loginForm">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" type="email" autocomplete="username" maxlength="254" required>
+
+          <label for="loginPassword">Login password</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" maxlength="128" required>
+
+          <button class="primary full" type="submit">Log in</button>
+        </form>
+      </div>
+    </div>
+    <p class="notice">Use different passwords for login and trading. Never reuse passwords from your other accounts.</p>
+  </section>
   <div id="message" role="status">Connecting to the demo exchange...</div>
 
   <section class="page active" id="home">
@@ -161,6 +201,8 @@ footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid va
         <form id="buyForm">
           <label for="buySymbol">Asset</label><select id="buySymbol"></select>
           <label for="buyQuantity">Quantity to buy</label><input id="buyQuantity" type="number" min="0.00000001" step="any" value="1" required>
+          <label for="buyFundsPassword">Funds password</label>
+          <input id="buyFundsPassword" type="password" autocomplete="off" required>
           <div class="notice" id="buyEstimate">Estimated cost: —</div>
           <button class="primary full" type="submit">Buy with demo funds</button>
         </form>
@@ -170,6 +212,8 @@ footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid va
         <form id="sellForm">
           <label for="sellSymbol">Asset</label><select id="sellSymbol"></select>
           <label for="sellQuantity">Quantity to sell</label><input id="sellQuantity" type="number" min="0.00000001" step="any" value="1" required>
+          <label for="sellFundsPassword">Funds password</label>
+          <input id="sellFundsPassword" type="password" autocomplete="off" required>
           <div class="notice" id="sellEstimate">Estimated proceeds: —</div>
           <button class="primary full" type="submit">Sell demo holdings</button>
         </form>
@@ -202,7 +246,7 @@ footer{text-align:center;color:var(--muted);padding:25px;border-top:1px solid va
 const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",FREE:"Free World"};
 const money=n=>"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const qty=n=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:8});
-let prices={},wallet={available_balance:0,holdings:{},transactions:[]},busy=false;
+let prices={},wallet={available_balance:0,holdings:{},transactions:[]},busy=false,currentUser=null;
 
 function showMessage(text){document.getElementById("message").textContent=text}
 async function api(path,options={}){
@@ -212,6 +256,73 @@ async function api(path,options={}){
  if(!response.ok)throw new Error(data.detail||"Request failed.");
  return data;
 }
+
+function showAuth(){
+ document.querySelectorAll(".page").forEach(page=>page.classList.remove("active"));
+ document.getElementById("authPanel").classList.add("active");
+ document.querySelector("header nav").style.display="none";
+ currentUser=null;
+}
+
+document.getElementById("registerForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const email=document.getElementById("registerEmail").value.trim();
+ const loginPassword=document.getElementById("registerPassword").value;
+ const fundsPassword=document.getElementById("registerFundsPassword").value;
+
+ try{
+  const result=await api("/auth/register",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    email,
+    login_password:loginPassword,
+    funds_password:fundsPassword
+   })
+  });
+
+  currentUser=result.user;
+  document.getElementById("registerForm").reset();
+  showDashboard();
+  showMessage(result.message||"Account created successfully.");
+  await refreshAll();
+ }catch(error){
+  showMessage("Registration failed: "+error.message);
+ }
+});
+
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const email=document.getElementById("loginEmail").value.trim();
+ const loginPassword=document.getElementById("loginPassword").value;
+
+ try{
+  const result=await api("/auth/login",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    email,
+    login_password:loginPassword
+   })
+  });
+
+  currentUser=result.user;
+  document.getElementById("loginForm").reset();
+  showDashboard();
+  showMessage(result.message||"Login successful.");
+  await refreshAll();
+ }catch(error){
+  showMessage("Login failed: "+error.message);
+ }
+});
+
+function showDashboard(){
+ document.getElementById("authPanel").classList.remove("active");
+ document.querySelector("header nav").style.display="";
+ document.querySelectorAll(".page").forEach(page=>page.classList.toggle("active",page.id==="home"));
+ document.querySelectorAll("nav button").forEach(button=>button.classList.toggle("active",button.dataset.page==="home"));
+}
+
 function portfolioValue(){
  return Number(wallet.available_balance||0)+Object.entries(wallet.holdings||{}).reduce((sum,[symbol,amount])=>sum+Number(amount)*(prices[symbol]||0),0);
 }
@@ -294,37 +405,38 @@ function drawRSI(candles) {
 
   const period = 7;
   const closes = candles.map(c => c.close);
-  const values = [];
+  const values = Array(closes.length).fill(null);
 
-  for (let i = 0; i < closes.length; i++) {
-    if (i < period) {
-      values.push(null);
-      continue;
+  let avgGain = 0;
+  let avgLoss = 0;
+
+  for (let i = 1; i <= period && i < closes.length; i++) {
+    const change = closes[i] - closes[i - 1];
+
+    if (change > 0) avgGain += change;
+    else avgLoss -= change;
+  }
+
+  if (closes.length > period) {
+    avgGain /= period;
+    avgLoss /= period;
+
+    values[period] = avgLoss === 0
+      ? (avgGain === 0 ? 50 : 100)
+      : 100 - (100 / (1 + avgGain / avgLoss));
+
+    for (let i = period + 1; i < closes.length; i++) {
+      const change = closes[i] - closes[i - 1];
+      const gain = Math.max(change, 0);
+      const loss = Math.max(-change, 0);
+
+      avgGain = (avgGain * (period - 1) + gain) / period;
+      avgLoss = (avgLoss * (period - 1) + loss) / period;
+
+      values[i] = avgLoss === 0
+        ? (avgGain === 0 ? 50 : 100)
+        : 100 - (100 / (1 + avgGain / avgLoss));
     }
-
-    let gains = 0;
-    let losses = 0;
-
-    for (let j = i - period + 1; j <= i; j++) {
-      const change = closes[j] - closes[j - 1];
-
-      if (change > 0) gains += change;
-      else losses -= change;
-    }
-
-    const avgGain = gains / period;
-    const avgLoss = losses / period;
-
-    let rsi;
-
-    if (avgLoss === 0) {
-      rsi = avgGain === 0 ? 50 : 100;
-    } else {
-      const rs = avgGain / avgLoss;
-      rsi = 100 - (100 / (1 + rs));
-    }
-
-    values.push(rsi);
   }
 
   const left = 35;
@@ -599,22 +711,70 @@ function selectChartRange(range) {
 
 async function refreshAll(){
  try{
-  const [marketData,walletData]=await Promise.all([api("/market/prices"),api("/wallet")]);
-  prices={};(marketData.prices||[]).forEach(item=>prices[item.symbol]=Number(item.price));
-wallet=walletData;renderMarkets();renderWallet();drawMarketChart();
-  showMessage("Demo exchange connected. Wallet and markets updated.");
- }catch(error){showMessage("Connection error: "+error.message+" Check that the API server is running.");}
+  const marketData=await api("/market/prices");
+  prices={};
+  (marketData.prices||[]).forEach(item=>prices[item.symbol]=Number(item.price));
+  renderMarkets();
+  drawMarketChart();
+
+  try{
+   currentUser=await api("/auth/me");
+   showDashboard();
+   wallet=await api("/wallet");
+   renderWallet();
+   showMessage("Demo exchange connected. Wallet and markets updated.");
+  }catch(error){
+   wallet={available_balance:0,holdings:{},transactions:[]};
+   if(error.message==="Please log in first."||error.message.toLowerCase().includes("unauthorized")){
+    showAuth();
+    showMessage("Please log in or create an account to access your demo wallet.");
+   }else{
+    showMessage("Wallet error: "+error.message);
+   }
+  }
+ }catch(error){
+  showMessage("Connection error: "+error.message+" Check that the API server is running.");
+ }
 }
-async function trade(side,symbol,quantity){
+async function trade(side,symbol,quantity,fundsPassword){
  if(busy)return;
  busy=true;
  try{
-  const result=await api("/trade/"+side,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symbol,quantity})});
+  const result=await api("/trade/"+side,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({symbol,quantity,funds_password:fundsPassword})
+  });
   await refreshAll();
   showMessage(result.message||"Simulated "+side+" completed successfully.");
- }catch(error){showMessage("Trade failed: "+error.message);}
- finally{busy=false;}
+ }catch(error){
+  showMessage("Trade failed: "+error.message);
+ }finally{
+  busy=false;
+ }
 }
+document.getElementById("logoutButton").addEventListener("click", async () => {
+ const button = document.getElementById("logoutButton");
+ button.disabled = true;
+
+ try {
+  const result = await api("/auth/logout", {method: "POST"});
+
+  currentUser = null;
+  wallet = {available_balance: 0, holdings: {}, transactions: []};
+
+  document.getElementById("buyFundsPassword").value = "";
+  document.getElementById("sellFundsPassword").value = "";
+
+  showAuth();
+  showMessage(result.message || "Logged out successfully.");
+ } catch (error) {
+  showMessage("Logout failed: " + error.message);
+ } finally {
+  button.disabled = false;
+ }
+});
+
 document.querySelectorAll("nav button[data-page]").forEach(button=>button.addEventListener("click",()=>{
  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -653,12 +813,20 @@ document.querySelectorAll('nav button[data-page="markets"]').forEach(button => {
 });
 
 document.getElementById("buyForm").addEventListener("submit",event=>{
- event.preventDefault();const quantity=Number(document.getElementById("buyQuantity").value);
- if(Number.isFinite(quantity)&&quantity>0)trade("buy",document.getElementById("buySymbol").value,quantity);
+ event.preventDefault();
+ const quantity=Number(document.getElementById("buyQuantity").value);
+ const fundsPassword=document.getElementById("buyFundsPassword").value;
+ if(Number.isFinite(quantity)&&quantity>0){
+  trade("buy",document.getElementById("buySymbol").value,quantity,fundsPassword);
+ }
 });
 document.getElementById("sellForm").addEventListener("submit",event=>{
- event.preventDefault();const quantity=Number(document.getElementById("sellQuantity").value);
- if(Number.isFinite(quantity)&&quantity>0)trade("sell",document.getElementById("sellSymbol").value,quantity);
+ event.preventDefault();
+ const quantity=Number(document.getElementById("sellQuantity").value);
+ const fundsPassword=document.getElementById("sellFundsPassword").value;
+ if(Number.isFinite(quantity)&&quantity>0){
+  trade("sell",document.getElementById("sellSymbol").value,quantity,fundsPassword);
+ }
 });
 ["buySymbol","buyQuantity","sellSymbol","sellQuantity"].forEach(id=>document.getElementById(id).addEventListener("input",updateEstimates));
 refreshAll();
