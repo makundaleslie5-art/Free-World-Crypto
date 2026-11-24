@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+data/*.db
+
+.env
+
+# Local databases and backups
+data/
+*.bak
+*.before-*
+static/index-backup.html
+
+# Python test cache
+.pytest_cache/
