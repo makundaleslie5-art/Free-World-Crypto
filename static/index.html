@@ -126,7 +126,76 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
 @media(max-width:820px){.order-grid{grid-template-columns:1fr}.trade-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.trade-overview-note{grid-column:1/-1}}
 @media(max-width:520px){.trade-overview{grid-template-columns:1fr 1fr;gap:8px}.trade-overview-card{padding:13px}.trade-overview-value{font-size:19px}.trade-overview-note{grid-column:1/-1}.order-card{padding:16px}.trade-heading h2{font-size:24px}}
 
-</style>
+
+/* Mobile bottom navigation */
+.nav-icon { display: none; }
+
+#logoutButton {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 13px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  body { padding-bottom: 82px; }
+
+  header {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  header nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    padding: 7px 5px calc(7px + env(safe-area-inset-bottom));
+    background: rgba(13, 19, 29, .97);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 25px #0005;
+    backdrop-filter: blur(16px);
+  }
+
+  header nav button {
+    min-width: 0;
+    min-height: 55px;
+    padding: 5px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  header nav button .nav-icon {
+    display: block;
+    font-size: 21px;
+    line-height: 1;
+  }
+
+  header nav button.active {
+    background: #292313;
+    color: #f2c766;
+  }
+
+  #logoutButton {
+    font-size: 10px;
+    padding: 8px 9px;
+  }
+}
+\n</style>
 </head>
 <body>
 <header>
@@ -135,12 +204,12 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
     <div class="tagline">CRYPTO EXCHANGE · DEMO PLATFORM</div>
   </div>
   <nav aria-label="Main navigation">
-    <button class="active" data-page="home">Home</button>
-    <button data-page="markets">Markets</button>
-    <button data-page="trades">Trades</button>
-    <button data-page="wallets">Wallets</button>
-    <button type="button" id="logoutButton">Logout</button>
+    <button class="active" data-page="home"><span class="nav-icon">⌂</span><span>Home</span></button>
+    <button data-page="markets"><span class="nav-icon">⌁</span><span>Markets</span></button>
+    <button data-page="trades"><span class="nav-icon">⇄</span><span>Trade</span></button>
+    <button data-page="wallets"><span class="nav-icon">▣</span><span>Assets</span></button>
   </nav>
+  <button type="button" id="logoutButton">Logout</button>
 </header>
 
 <main>
