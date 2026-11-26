@@ -3,7 +3,13 @@ from app.core.database import get_connection
 
 STARTING_BALANCE = 10_000.00
 wallet_lock = Lock()
-PRICES = {"BTC": 65000.00, "ETH": 3200.00, "SOL": 150.00, "FREE": 0.01}
+PRICES = {
+    "BTC": 65000.00, "ETH": 3200.00, "SOL": 150.00,
+    "BNB": 600.00, "XRP": 0.60, "LINK": 15.00,
+    "DOGE": 0.15, "ADA": 0.45, "AVAX": 35.00,
+    "HYPE": 25.00, "DOT": 7.00, "LTC": 80.00,
+    "TRX": 0.12, "FREE": 0.01,
+}
 
 
 def load_wallet(user_id: int = 1):

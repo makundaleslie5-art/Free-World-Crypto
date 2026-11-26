@@ -200,7 +200,37 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
     padding: 8px 9px;
   }
 }
-\n</style>
+\n
+/* Mobile wallet table optimization */
+@media (max-width: 600px) {
+  #wallets .table-wrap {
+    overflow-x: hidden;
+    min-width: 0;
+  }
+
+  #wallets table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  #wallets table th,
+  #wallets table td {
+    padding: 10px 4px;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #wallets table th {
+    font-size: 9px;
+  }
+}
+
+</style>
 </head>
 <body>
 <header>
@@ -292,7 +322,20 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
             <div><div class="chart-title" id="chartAssetName">Bitcoin <span class="muted">/ USD</span></div><div class="chart-sub">Spot market reference · USD denomination</div></div>
           </div>
           <select id="chartSymbol" aria-label="Select chart asset">
-            <option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="SOL">Solana (SOL)</option><option value="FREE">Free World (FREE)</option>
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="SOL">Solana (SOL)</option>
+            <option value="BNB">BNB (BNB)</option>
+            <option value="XRP">XRP (XRP)</option>
+            <option value="LINK">Chainlink (LINK)</option>
+            <option value="DOGE">Dogecoin (DOGE)</option>
+            <option value="ADA">Cardano (ADA)</option>
+            <option value="AVAX">Avalanche (AVAX)</option>
+            <option value="HYPE">Hyperliquid (HYPE)</option>
+            <option value="DOT">Polkadot (DOT)</option>
+            <option value="LTC">Litecoin (LTC)</option>
+            <option value="TRX">TRON (TRX)</option>
+            <option value="FREE">Free World (FREE)</option>
           </select>
         </div>
         <div class="chart-summary">
@@ -315,7 +358,7 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
         <div class="side-panel"><h3>Execution environment</h3><div class="market-mini"><div><strong>Account</strong><small>Private demo wallet</small></div><div class="mini-price">SIMULATED</div></div><div class="market-mini"><div><strong>Order routing</strong><small>No exchange connection</small></div><div class="mini-price">OFF</div></div><div class="side-note" style="margin-top:12px">Market prices are reference data only. Trades update your local demo balance and holdings.</div></div>
       </aside>
     </div>
-    <p class="notice" id="marketChartDisclaimer" style="margin:12px 2px 0">BTC, ETH and SOL use CoinGecko historical OHLC candles. Volume is shown as rolling 24-hour snapshots, not per-candle exchange volume. FREE is a simulated project asset and has no external historical feed.</p>
+    <p class="notice" id="marketChartDisclaimer" style="margin:12px 2px 0">Listed crypto assets use CoinGecko historical OHLC candles. Volume is shown as rolling 24-hour snapshots, not per-candle exchange volume. FREE is a simulated project asset and has no external historical feed.</p>
 
 <div class="panel table-wrap"><table><thead><tr><th>Asset</th><th>Pair</th><th>Price (USD)</th><th>Action</th></tr></thead><tbody id="marketRows"><tr><td colspan="4">Loading markets...</td></tr></tbody></table></div>
     <p class="notice" id="marketNotice">Connecting to market data. Trades use demo funds only and do not execute on a real exchange.</p>
@@ -387,7 +430,7 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
 <footer>FREE WORLD CRYPTO · Simulated trading · Market reference data provided by CoinGecko · No real deposits or withdrawals</footer>
 
 <script>
-const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",FREE:"Free World"};
+const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",BNB:"BNB",XRP:"XRP",LINK:"Chainlink",DOGE:"Dogecoin",ADA:"Cardano",AVAX:"Avalanche",HYPE:"Hyperliquid",DOT:"Polkadot",LTC:"Litecoin",TRX:"TRON",FREE:"Free World"};
 const money=n=>"$"+Number(n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const qty=n=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:8});
 let prices={},wallet={available_balance:0,holdings:{},transactions:[]},busy=false,currentUser=null;
@@ -736,7 +779,7 @@ function drawMarketChart() {
   const symbol = document.getElementById("chartSymbol")?.value || "BTC";
   const currentPrice = Number(prices[symbol] || 0);
   document.getElementById("chartPrice").textContent = money(currentPrice);
-  const names = {BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",FREE:"Free World"};
+  const names = {BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",BNB:"BNB",XRP:"XRP",LINK:"Chainlink",DOGE:"Dogecoin",ADA:"Cardano",AVAX:"Avalanche",HYPE:"Hyperliquid",DOT:"Polkadot",LTC:"Litecoin",TRX:"TRON",FREE:"Free World"};
   document.getElementById("chartAssetName").innerHTML = `${names[symbol]||symbol} <span class="muted">/ USD</span>`;
   document.getElementById("chartAssetMark").textContent = ({BTC:"₿",ETH:"Ξ",SOL:"◎",FREE:"F"})[symbol]||symbol.slice(0,1);
   document.getElementById("chartFeedLabel").textContent = symbol === "FREE" ? "Simulated project asset" : "CoinGecko historical feed";

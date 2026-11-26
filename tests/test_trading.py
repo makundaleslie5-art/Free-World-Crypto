@@ -88,6 +88,16 @@ class TradingSafetyTests(unittest.TestCase):
 
         self.assertEqual(balance, 9999.00)
         self.assertEqual(transaction_count, 1)
+    def test_new_assets_support_buy_and_sell(self):
+        symbols = ["BNB", "XRP", "LINK", "DOGE", "ADA",
+                   "AVAX", "HYPE", "DOT", "LTC", "TRX"]
+
+        for symbol in symbols:
+            trading.buy(symbol, 1, price=1.00)
+            result = trading.sell(symbol, 1, price=1.00)
+            self.assertEqual(result["symbol"], symbol)
+            self.assertEqual(result["side"], "SELL")
+
     def test_unsupported_symbol_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Unsupported cryptocurrency"):
             trading.buy("UNKNOWN", 1)

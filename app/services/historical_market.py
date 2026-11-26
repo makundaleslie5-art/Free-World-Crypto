@@ -35,7 +35,7 @@ def _coin_url(coin_id, endpoint, params):
 def get_historical_chart(symbol, force_refresh=False):
     symbol = symbol.upper()
     if symbol not in COIN_IDS:
-        raise ValueError("Historical charts are available for BTC, ETH and SOL only. FREE is a simulated project asset.")
+        raise ValueError("Historical charts are available for listed CoinGecko assets. FREE is a simulated project asset.")
 
     now = time.time()
     cached = _cache.get(symbol)

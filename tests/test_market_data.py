@@ -23,6 +23,14 @@ class MarketDataTests(unittest.TestCase):
         self.assertEqual(prices["BTC"]["price_type"], "live")
         self.assertEqual(prices["FREE"]["price_type"], "simulated")
 
+    def test_all_requested_assets_have_coin_ids_and_fallback_prices(self):
+        expected = ["BNB", "XRP", "LINK", "DOGE", "ADA",
+                    "AVAX", "HYPE", "DOT", "LTC", "TRX"]
+
+        for symbol in expected:
+            self.assertIn(symbol, market_data.COIN_IDS)
+            self.assertIn(symbol, market_data.PRICES)
+
     @patch("app.services.market_data._fetch_coingecko", side_effect=OSError("offline"))
     def test_provider_failure_is_labelled_sample_fallback(self, fetch):
         result = market_data.get_market_snapshot(force_refresh=True)

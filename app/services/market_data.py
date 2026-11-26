@@ -28,7 +28,21 @@ def _load_local_env():
         os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 _load_local_env()
-COIN_IDS = {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana"}
+COIN_IDS = {
+    "BTC": "bitcoin",
+    "ETH": "ethereum",
+    "SOL": "solana",
+    "BNB": "binancecoin",
+    "XRP": "ripple",
+    "LINK": "chainlink",
+    "DOGE": "dogecoin",
+    "ADA": "cardano",
+    "AVAX": "avalanche-2",
+    "HYPE": "hyperliquid",
+    "DOT": "polkadot",
+    "LTC": "litecoin",
+    "TRX": "tron",
+}
 CACHE_SECONDS = 300
 STALE_SECONDS = 300
 _cache = {"updated_at": 0.0, "prices": {}, "source": None}
