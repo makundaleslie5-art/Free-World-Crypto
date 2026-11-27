@@ -37,6 +37,20 @@ def initialize_database():
             funds_password_hash TEXT NOT NULL,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )""")
+
+        # Safely migrate existing users to support account suspension.
+        user_columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(users)").fetchall()
+        }
+
+        if "is_suspended" not in user_columns:
+            connection.execute("""
+                ALTER TABLE users
+                ADD COLUMN is_suspended INTEGER NOT NULL DEFAULT 0
+                CHECK (is_suspended IN (0, 1))
+            """)
+
         connection.execute("""CREATE TABLE IF NOT EXISTS user_wallets (
             user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
             available_balance REAL NOT NULL CHECK (available_balance >= 0),
@@ -63,6 +77,55 @@ def initialize_database():
             user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )""")
+
+        connection.execute("""CREATE TABLE IF NOT EXISTS admin_users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'super_admin'
+                CHECK (role IN ('super_admin', 'admin', 'analyst')),
+            is_active INTEGER NOT NULL DEFAULT 1
+                CHECK (is_active IN (0, 1)),
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_login_at TEXT
+        )""")
+
+        connection.execute("""CREATE TABLE IF NOT EXISTS admin_sessions (
+            token_hash TEXT PRIMARY KEY,
+            admin_id INTEGER NOT NULL REFERENCES admin_users(id)
+                ON DELETE CASCADE,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            expires_at TEXT NOT NULL,
+            revoked_at TEXT
+        )""")
+
+        connection.execute("""CREATE TABLE IF NOT EXISTS admin_audit_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            actor_admin_id INTEGER NOT NULL REFERENCES admin_users(id)
+                ON DELETE RESTRICT,
+            action TEXT NOT NULL,
+            target_type TEXT NOT NULL,
+            target_id TEXT,
+            details_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )""")
+
+        connection.execute("""
+            CREATE TRIGGER IF NOT EXISTS prevent_admin_audit_update
+            BEFORE UPDATE ON admin_audit_logs
+            BEGIN
+                SELECT RAISE(ABORT, 'Admin audit records cannot be updated');
+            END
+        """)
+
+        connection.execute("""
+            CREATE TRIGGER IF NOT EXISTS prevent_admin_audit_delete
+            BEFORE DELETE ON admin_audit_logs
+            BEGIN
+                SELECT RAISE(ABORT, 'Admin audit records cannot be deleted');
+            END
+        """)
+
         # A reserved legacy/demo account preserves old data and the original unit-test behavior.
         connection.execute("""INSERT OR IGNORE INTO users (id, email, login_password_hash, funds_password_hash)
             VALUES (1, 'demo@freeworld.local', 'legacy-disabled', 'legacy-disabled')""")

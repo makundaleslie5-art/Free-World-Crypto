@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free World Crypto | Administration</title>
+
+<style>
+:root {
+    --green: #254D35;
+    --deep-green: #26332B;
+    --brown: #713B32;
+    --beige: #E8DCC5;
+    --ivory: #F5F0E6;
+    --gold: #B69A72;
+    --text: #29352D;
+    --muted: #7D8177;
+    --white: #FFFFFF;
+    --border: #DDD3C1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--ivory);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+}
+
+button, input { font: inherit; }
+
+.hidden { display: none !important; }
+
+/* LOGIN */
+
+.login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--deep-green);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 38px;
+    background: var(--ivory);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px #0004;
+}
+
+.brand {
+    color: var(--green);
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.login-card h1 {
+    margin: 35px 0 8px;
+    font-size: 26px;
+}
+
+.subtitle {
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.field { margin-top: 22px; }
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.field input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: white;
+    outline-color: var(--green);
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 14px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--green);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+.primary-btn:hover { background: var(--deep-green); }
+
+.message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: var(--brown);
+}
+
+/* DASHBOARD */
+
+.layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--green);
+    color: white;
+    padding: 28px 18px;
+}
+
+.sidebar .brand { color: var(--beige); }
+
+.side-label {
+    margin: 38px 12px 12px;
+    color: #C8D1C8;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+.nav-item {
+    display: block;
+    width: 100%;
+    padding: 13px 14px;
+    margin: 5px 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #F5F0E6;
+    text-align: left;
+    cursor: pointer;
+}
+
+.nav-item:hover, .nav-item.active {
+    background: #FFFFFF20;
+}
+
+.sidebar-footer {
+    margin-top: 55px;
+    padding: 12px;
+    border-top: 1px solid #FFFFFF30;
+    font-size: 12px;
+    color: #D7DDCF;
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.topbar h1 {
+    margin: 0;
+    font-size: 27px;
+}
+
+.admin-label {
+    color: var(--green);
+    background: var(--beige);
+    border-radius: 30px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.section-title {
+    margin: 0 0 18px;
+    font-size: 17px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    padding: 22px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+}
+
+.stat-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    margin: 15px 0 0;
+    font-size: 25px;
+    color: var(--green);
+}
+
+.panel {
+    margin-top: 25px;
+    padding: 25px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+}
+
+.panel p {
+    color: var(--muted);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.warning {
+    border-left: 4px solid var(--brown);
+    background: #F1E5DF;
+    padding: 15px;
+    border-radius: 6px;
+    color: var(--brown);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.logout-btn {
+    padding: 10px 15px;
+    border: 1px solid var(--brown);
+    color: var(--brown);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@media(max-width: 900px) {
+    .sidebar { width: 210px; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 600px) {
+    .layout { display: block; }
+    .sidebar { width: 100%; padding: 18px; }
+    .side-label, .sidebar-footer { display: none; }
+    .main { padding: 20px; }
+    .cards { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ADMIN LOGIN -->
+<section class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="brand">FREE WORLD CRYPTO</div>
+        <p class="subtitle">ADMINISTRATION PORTAL</p>
+
+        <h1>Administrator Login</h1>
+        <p class="subtitle">
+            Secure access for authorised platform administrators.
+        </p>
+
+        <form id="loginForm">
+            <div class="field">
+                <label for="email">Administrator email</label>
+                <input id="email" type="email" required autocomplete="username">
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" required autocomplete="current-password">
+            </div>
+
+            <button class="primary-btn" id="loginButton" type="submit">
+                Secure Login
+            </button>
+            <div class="message" id="loginMessage"></div>
+        </form>
+    </div>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<div class="layout hidden" id="dashboard">
+
+    <aside class="sidebar">
+        <div class="brand">FREE WORLD<br>CRYPTO</div>
+
+        <div class="side-label">MAIN MENU</div>
+        <button class="nav-item active">Overview</button>
+        <button class="nav-item">User Management</button>
+        <button class="nav-item">Wallet Management</button>
+        <button class="nav-item">Transactions</button>
+
+        <div class="side-label">PLATFORM CONTROL</div>
+        <button class="nav-item">Market Management</button>
+        <button class="nav-item">Trading Controls</button>
+        <button class="nav-item">Audit Logs</button>
+        <button class="nav-item">System Health</button>
+
+        <div class="sidebar-footer">
+            Authorised administration only
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1>Overview</h1>
+                <p class="subtitle">Platform administration and monitoring</p>
+            </div>
+
+            <div>
+                <span class="admin-label" id="adminIdentity">ADMINISTRATOR</span>
+                <button class="logout-btn" id="logoutButton">Logout</button>
+            </div>
+        </header>
+
+        <h2 class="section-title">Platform Summary</h2>
+
+        <section class="cards">
+            <div class="stat-card">
+                <p>Total Users</p>
+                <h2>—</h2>
+            </div>
+            <div class="stat-card">
+                <p>Active Accounts</p>
+                <h2>—</h2>
+            </div>
+            <div class="stat-card">
+                <p>Demo Transactions</p>
+                <h2>—</h2>
+            </div>
+            <div class="stat-card">
+                <p>Platform Status</p>
+                <h2>—</h2>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Administration Centre</h2>
+            <p>
+                Welcome to the Free World Crypto administration environment.
+                Platform statistics and management functions will appear here
+                as their backend services are connected.
+            </p>
+
+            <div class="warning">
+                This is a simulated cryptocurrency trading platform.
+                Administrative wallet controls affect demo balances only.
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="section-title">Security Notice</h2>
+            <p>
+                Administrative actions must be authorised, recorded and
+                traceable through the platform audit system.
+            </p>
+        </section>
+    </main>
+</div>
+
+<script>
+const loginScreen = document.getElementById("loginScreen");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+
+let adminToken = sessionStorage.getItem("fwc_admin_token");
+
+function showDashboard(admin) {
+    loginScreen.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+
+    document.getElementById("adminIdentity").textContent =
+        (admin.role || "ADMIN").toUpperCase();
+}
+
+function showLogin() {
+    sessionStorage.removeItem("fwc_admin_token");
+    adminToken = null;
+    dashboard.classList.add("hidden");
+    loginScreen.classList.remove("hidden");
+}
+
+async function verifySession() {
+    if (!adminToken) return;
+
+    try {
+        const response = await fetch("/admin/auth/me", {
+            headers: {
+                "Authorization": `Bearer ${adminToken}`
+            }
+        });
+
+        if (!response.ok) {
+            showLogin();
+            return;
+        }
+
+        showDashboard(await response.json());
+    } catch (error) {
+        showLogin();
+    }
+}
+
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = document.getElementById("loginButton");
+    button.disabled = true;
+    button.textContent = "Authenticating...";
+    loginMessage.textContent = "";
+
+    try {
+        const response = await fetch("/admin/auth/login", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Login failed.");
+        }
+
+        adminToken = data.token;
+        sessionStorage.setItem("fwc_admin_token", adminToken);
+
+        document.getElementById("password").value = "";
+        showDashboard(data.admin);
+
+    } catch (error) {
+        loginMessage.textContent = error.message;
+    } finally {
+        button.disabled = false;
+        button.textContent = "Secure Login";
+    }
+});
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+    if (adminToken) {
+        try {
+            await fetch("/admin/auth/logout", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${adminToken}`
+                }
+            });
+        } catch (error) {
+            console.error("Logout request failed.");
+        }
+    }
+
+    showLogin();
+});
+
+verifySession();
+</script>
+
+</body>
+</html>
