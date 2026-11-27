@@ -1,13 +1,14 @@
 import hashlib
 import hmac
 import secrets
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.core.database import initialize_database, get_connection
 from app.services.trading import PRICES, buy, sell, get_wallet
 from app.services.market_data import get_market_snapshot, get_trade_price
 from app.services.historical_market import get_historical_chart, get_market_overview
+from app.services.live_market import live_market_feed
 
 app = FastAPI(title="Free World Crypto", description="Crypto trading simulation platform API", version="0.5.0")
 
@@ -90,6 +91,19 @@ def health_check():
     return {"status": "healthy", "trading_mode": "simulation_only"}
 
 
+
+
+
+@app.websocket("/ws/market")
+async def live_market_socket(websocket: WebSocket):
+    await live_market_feed.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        pass
+    finally:
+        await live_market_feed.disconnect(websocket)
 
 @app.get("/market/prices")
 def market_prices():

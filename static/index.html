@@ -589,6 +589,119 @@ let historicalChart = null;
 let chartLoading = false;
 let chartRequestId = 0;
 let chartError = "";
+let liveSocket = null;
+let livePrices = {};
+let liveLastTick = {};
+let liveCandles = {};
+let liveReconnectTimer = null;
+let liveHeartbeat = null;
+let liveRedrawTimer = null;
+let liveChartDirty = false;
+
+function getChartCandles() {
+  if (!historicalChart?.candles?.length) return [];
+
+  const candles = historicalChart.candles.map(c => ({...c}));
+  const symbol = historicalChart.symbol;
+  const live = liveCandles[symbol];
+
+  if (!live) return candles;
+
+  const last = candles[candles.length - 1];
+  if (live.time < last.time) return candles;
+
+  if (live.time === last.time) {
+    last.high = Math.max(last.high, live.high);
+    last.low = Math.min(last.low, live.low);
+    last.close = live.close;
+  } else {
+    candles.push({...live});
+  }
+
+  return candles;
+}
+
+function connectLiveMarket() {
+  if (liveSocket && (
+    liveSocket.readyState === WebSocket.OPEN ||
+    liveSocket.readyState === WebSocket.CONNECTING
+  )) return;
+
+  const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+  const socket = new WebSocket(`${protocol}//${location.host}/ws/market`);
+  liveSocket = socket;
+
+  socket.onmessage = event => {
+    try {
+      const tick = JSON.parse(event.data);
+      if (tick.type !== "trade") return;
+
+      const symbol = tick.symbol;
+      const price = Number(tick.price);
+      const timestamp = Number(tick.trade_time);
+
+      if (!Number.isFinite(price) || price <= 0 ||
+          !Number.isFinite(timestamp)) return;
+
+      livePrices[symbol] = price;
+      liveLastTick[symbol] = Date.now();
+
+      const bucket = Math.floor((timestamp / 1000) / 1800) * 1800;
+      const previous = liveCandles[symbol];
+
+      if (!previous || previous.time !== bucket) {
+        const historical = historicalChart?.symbol === symbol
+          ? historicalChart.candles.find(c => c.time === bucket)
+          : null;
+
+        liveCandles[symbol] = {
+          time: bucket,
+          open: historical ? historical.open : price,
+          high: Math.max(historical?.high ?? price, price),
+          low: Math.min(historical?.low ?? price, price),
+          close: price
+        };
+      } else {
+        previous.high = Math.max(previous.high, price);
+        previous.low = Math.min(previous.low, price);
+        previous.close = price;
+      }
+
+      if (document.getElementById("chartSymbol")?.value === symbol) {
+        liveChartDirty = true;
+      }
+    } catch (error) {
+      console.error("Invalid live market message:", error);
+    }
+  };
+
+  socket.onclose = () => {
+    if (liveSocket === socket) liveSocket = null;
+    clearTimeout(liveReconnectTimer);
+    liveReconnectTimer = setTimeout(connectLiveMarket, 3000);
+  };
+
+  socket.onerror = () => socket.close();
+}
+
+function startLiveMarketUpdates() {
+  connectLiveMarket();
+
+  clearInterval(liveHeartbeat);
+  clearInterval(liveRedrawTimer);
+
+  liveHeartbeat = setInterval(() => {
+    if (liveSocket?.readyState === WebSocket.OPEN) {
+      liveSocket.send("ping");
+    }
+  }, 25000);
+
+  liveRedrawTimer = setInterval(() => {
+    if (!liveChartDirty) return;
+    liveChartDirty = false;
+    drawMarketChart();
+  }, 1000);
+}
 const chartRangeSeconds = {"1H": 3600, "4H": 14400, "1D": 86400};
 
 function canvasContext(id) {
@@ -612,12 +725,13 @@ function drawEmptyChart(id, message) {
   surface.ctx.font = "12px Arial";
   surface.ctx.fillText(message, 16, 28);
 }
-
 function selectedCandles() {
   if (!historicalChart?.candles?.length) return [];
-  const all = historicalChart.candles;
+
+  const all = getChartCandles();
   const latest = all[all.length - 1].time;
   const cutoff = latest - chartRangeSeconds[chartRange];
+
   return all.filter(candle => candle.time >= cutoff);
 }
 
@@ -756,7 +870,7 @@ function drawMACD(candles) {
   const surface = canvasContext("macdChart");
   if (!surface) return;
   const {ctx,width,height} = surface;
-  const all = historicalChart.candles;
+  const all = getChartCandles();
   const calculated = calculateMACD(all);
   const map = new Map(all.map((c,i)=>[c.time,i]));
   const points = candles.map(c=>({c,index:map.get(c.time)})).filter(p=>p.index!==undefined && calculated.histogram[p.index]!==null);
@@ -777,12 +891,20 @@ function drawMACD(candles) {
 
 function drawMarketChart() {
   const symbol = document.getElementById("chartSymbol")?.value || "BTC";
-  const currentPrice = Number(prices[symbol] || 0);
+const tickIsFresh = Date.now() - (liveLastTick[symbol] || 0) < 10000;
+const currentPrice = tickIsFresh
+  ? Number(livePrices[symbol])
+  : Number(prices[symbol] || 0);
   document.getElementById("chartPrice").textContent = money(currentPrice);
   const names = {BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",BNB:"BNB",XRP:"XRP",LINK:"Chainlink",DOGE:"Dogecoin",ADA:"Cardano",AVAX:"Avalanche",HYPE:"Hyperliquid",DOT:"Polkadot",LTC:"Litecoin",TRX:"TRON",FREE:"Free World"};
   document.getElementById("chartAssetName").innerHTML = `${names[symbol]||symbol} <span class="muted">/ USD</span>`;
   document.getElementById("chartAssetMark").textContent = ({BTC:"₿",ETH:"Ξ",SOL:"◎",FREE:"F"})[symbol]||symbol.slice(0,1);
-  document.getElementById("chartFeedLabel").textContent = symbol === "FREE" ? "Simulated project asset" : "CoinGecko historical feed";
+
+
+document.getElementById("chartFeedLabel").textContent =
+  symbol === "FREE" ? "Simulated project asset" :
+  tickIsFresh ? "Binance USDT · LIVE" :
+  "CoinGecko history · Live feed waiting";
   const foot = document.getElementById("chartFootStatus");
   if (symbol === "FREE") {
     document.getElementById("chartChange24h").textContent = "SIMULATED";
@@ -797,7 +919,7 @@ function drawMarketChart() {
     foot.textContent = chartLoading ? "Loading historical candles" : (chartError || "Historical data unavailable");
     return;
   }
-  const all = historicalChart.candles;
+  const all = getChartCandles();
   const selected = selectedCandles();
   if (!selected.length) {
     ["marketChart","volumeChart","macdChart","rsiChart"].forEach(id=>drawEmptyChart(id,"No candles in the selected time window."));
@@ -810,7 +932,11 @@ function drawMarketChart() {
   const indexByTime = new Map(all.map((c,i)=>[c.time,i]));
   const selectedRSI = selected.map(c=>allRSI[indexByTime.get(c.time)]);
   drawIndicator("rsiChart", selected, selectedRSI, "RSI (14)", [0,100]);
-  foot.textContent = `CoinGecko · ${historicalChart.granularity} candles · refreshed ${new Date(historicalChart.fetched_at*1000).toLocaleTimeString()}`;
+
+
+foot.textContent = tickIsFresh
+  ? `Binance live candle · CoinGecko ${historicalChart.granularity} history · 24h volume snapshot`
+  : `Live feed waiting or stale · CoinGecko ${historicalChart.granularity} history`;
 }
 
 async function loadHistoricalChart(force=false) {
@@ -997,6 +1123,7 @@ document.querySelectorAll("[data-toggle-password]").forEach(button=>button.addEv
 refreshAll();
 // Refresh reference prices and cached historical chart data every five minutes.
 setInterval(refreshAll, 300000);
+startLiveMarketUpdates();
 </script>
 </body>
 </html>
