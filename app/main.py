@@ -1,11 +1,12 @@
 import json
+import os
 import hashlib
 import hmac
 import secrets
 from fastapi import FastAPI, HTTPException, Header, WebSocket, WebSocketDisconnect, Depends
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from app.core.database import initialize_database, get_connection
+from app.core.database import initialize_database, get_connection, DATABASE_PATH
 from app.services.trading import PRICES, buy, sell, get_wallet
 from app.services.market_data import get_market_snapshot, get_trade_price
 from app.services.historical_market import get_historical_chart, get_market_overview
@@ -515,4 +516,61 @@ json.dumps({
         "message": "User account suspended successfully.",
         "user_id": user_id,
         "sessions_revoked": revoked_sessions,
+    }
+
+
+class AdminDiagnosticRequest(BaseModel):
+    email: str = Field(min_length=5, max_length=254)
+    password: str = Field(min_length=1, max_length=128)
+
+
+@app.post("/internal/admin-diagnostic")
+def admin_diagnostic(
+    request: AdminDiagnosticRequest,
+    x_diagnostic_secret: str | None = Header(default=None),
+):
+    expected_secret = os.environ.get("ADMIN_DIAGNOSTIC_SECRET", "")
+
+    if (
+        not expected_secret
+        or not x_diagnostic_secret
+        or not secrets.compare_digest(x_diagnostic_secret, expected_secret)
+    ):
+        raise HTTPException(status_code=404, detail="Not found.")
+
+    email = request.email.strip().lower()
+
+    with get_connection() as connection:
+        admin = connection.execute(
+            """
+            SELECT email, password_hash, is_active
+            FROM admin_users
+            WHERE email = ?
+            """,
+            (email,),
+        ).fetchone()
+
+        admin_count = connection.execute(
+            "SELECT COUNT(*) FROM admin_users"
+        ).fetchone()[0]
+
+    if admin is None:
+        return {
+            "database_exists": DATABASE_PATH.is_file(),
+            "database_size_bytes": DATABASE_PATH.stat().st_size if DATABASE_PATH.is_file() else 0,
+            "admin_count": admin_count,
+            "admin_found": False,
+        }
+
+    stored = admin["password_hash"]
+    scheme = stored.split("$", 1)[0] if stored else "missing"
+
+    return {
+        "database_exists": DATABASE_PATH.is_file(),
+        "database_size_bytes": DATABASE_PATH.stat().st_size if DATABASE_PATH.is_file() else 0,
+        "admin_count": admin_count,
+        "admin_found": True,
+        "admin_active": bool(admin["is_active"]),
+        "hash_scheme": scheme,
+        "password_matches": verify_admin_password(request.password, stored),
     }
