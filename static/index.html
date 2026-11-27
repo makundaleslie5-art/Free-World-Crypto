@@ -262,11 +262,17 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
           <label for="registerEmail">Email address</label>
           <input id="registerEmail" type="email" autocomplete="email" maxlength="254" required>
 
-          <label for="registerPassword">Login password (minimum 12 characters)</label>
-          <input id="registerPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+          <label for="registerPassword">Login password (minimum 6 characters)</label>
+          <div class="password-wrap">
+            <input id="registerPassword" type="password" autocomplete="new-password" minlength="6" maxlength="128" required>
+            <button type="button" data-toggle-password="registerPassword">Show</button>
+          </div>
 
-          <label for="registerFundsPassword">Separate funds password (minimum 12 characters)</label>
-          <input id="registerFundsPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+          <label for="registerFundsPassword">Separate funds password (minimum 6 characters)</label>
+          <div class="password-wrap">
+            <input id="registerFundsPassword" type="password" autocomplete="new-password" minlength="6" maxlength="128" required>
+            <button type="button" data-toggle-password="registerFundsPassword">Show</button>
+          </div>
 
           <button class="primary full" type="submit">Create account</button>
         </form>
@@ -279,7 +285,10 @@ button.primary{background:#e9b949;color:#17130a;border-radius:7px}input,select{b
           <input id="loginEmail" type="email" autocomplete="username" maxlength="254" required>
 
           <label for="loginPassword">Login password</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" maxlength="128" required>
+          <div class="password-wrap">
+            <input id="loginPassword" type="password" autocomplete="current-password" maxlength="128" required>
+            <button type="button" data-toggle-password="loginPassword">Show</button>
+          </div>
 
           <button class="primary full" type="submit">Log in</button>
         </form>

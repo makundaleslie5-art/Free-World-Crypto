@@ -89,6 +89,45 @@ button, input { font: inherit; }
     outline-color: var(--green);
 }
 
+/* Password visibility control */
+.password-wrap {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: white;
+    overflow: hidden;
+}
+
+.password-wrap:focus-within {
+    outline: 2px solid var(--green);
+}
+
+.password-wrap input {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+}
+
+.password-wrap button {
+    padding: 0 15px;
+    border: 0;
+    border-left: 1px solid var(--border);
+    background: var(--beige);
+    color: var(--deep-green);
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.password-wrap button:hover {
+    background: var(--gold);
+}
+
 .primary-btn {
     width: 100%;
     padding: 14px;
@@ -286,7 +325,10 @@ button, input { font: inherit; }
 
             <div class="field">
                 <label for="password">Password</label>
-                <input id="password" type="password" required autocomplete="current-password">
+                <div class="password-wrap">
+                    <input id="password" type="password" required autocomplete="current-password">
+                    <button type="button" id="toggleAdminPassword">Show</button>
+                </div>
             </div>
 
             <button class="primary-btn" id="loginButton" type="submit">
@@ -478,6 +520,20 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 });
 
 verifySession();
+
+document.getElementById("toggleAdminPassword").addEventListener("click", () => {
+    const input = document.getElementById("password");
+    const button = document.getElementById("toggleAdminPassword");
+    const visible = input.type === "password";
+
+    input.type = visible ? "text" : "password";
+    button.textContent = visible ? "Hide" : "Show";
+    button.setAttribute(
+        "aria-label",
+        visible ? "Hide administrator password" : "Show administrator password"
+    );
+});
+
 </script>
 
 </body>

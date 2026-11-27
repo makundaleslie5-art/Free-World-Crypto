@@ -89,9 +89,8 @@ def startup():
 
 class RegisterRequest(BaseModel):
     email: str = Field(min_length=5, max_length=254)
-    login_password: str = Field(min_length=8, max_length=128)
-    funds_password: str = Field(min_length=12, max_length=128)
-
+    login_password: str = Field(min_length=6, max_length=128)
+    funds_password: str = Field(min_length=6, max_length=128)
 
 
 class LoginRequest(BaseModel):
